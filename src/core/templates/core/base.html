@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="author" content="geoolekom">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'core/main.css' %}">
+
+    <title> {% block title %} {% endblock %} </title>
+
+  </head>
+
+  <body>
+
+    <div class="fixed-header">
+      <table class="" width=100%> <tr>
+        <th class="brand" width=45% align="left"> <h1> <a href="{% url 'feed' %}">DGAP SERVICE</a> </h1> </th>
+
+        <th class="header-menu" width=10%><a href="#">HOME</a></th>
+        <th class="header-menu" width=10%><a href="#about">ABOUT</a></th>
+        <th class="header-menu" width=10%><a href="#contact">CONTACT</a></th>
+
+        
+        {% block user %}
+
+          {% if user.is_authenticated %}
+            <th width=10%> <img src="{{ user.avatar.url }}" height=80px border=3> </th>
+            <th width=15% align="left"> 
+              <p>{{user}}</p> 
+              <p>{% if user.is_staff %} Admin {% else %} Plain user {% endif %} </p>
+              <p> <form action="/logout/"> {% csrf_token %} <button type="submit" class="btn">Log out</button> </form> </p>
+            </th>
+          {% else %}
+            <th width=25% align="center"> <form class="user-info" action="/login/" method="post"> {% csrf_token %}
+              <p> 
+                <input class="span2" type="text" name="username" id="username"> 
+                <input class="span2" type="password" name="password" id="password"> 
+              </p>
+              <p> <button type="submit" class="btn">Sign in</button> </p>
+            </form> </th>
+          {% endif %}
+
+        {% endblock %}
+
+      </tr> </table>
+    </div>
+
+    <div class="content">
+      
+      {% block content %}
+        <h1> No posts avaliable </h1>
+      {% endblock %}
+
+      <hr>
+
+      <footer>
+        <p>&copy; Yegor Komarov 2016</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+  </body>
+</html>

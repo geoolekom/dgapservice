@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %} Newsfeed {% endblock %}
+
+{% block content %}
+
+	<div class="header">
+		<h1>Newsfeed</h1>
+	</div>
+	{% for post in object_list %}
+		<div class="post"> <table width="100%">
+		<tr> <h2>
+			<th align="left" width="80%"> <a href="{% url 'detail' post.id %}"> {{post.title}} </a> </th>
+			<th class="post-rating" align="center" rowspan="2"> {{post.rating}} </th>
+		</h2> </tr>
+		<tr>
+			<td> <p> {{post.summary}} </p> </td>
+		</tr>
+
+		</table> </div>
+	{% endfor %}
+
+{% endblock %}
