@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from feed.models import Post as myPost
+from feed.models import RatedPost
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -14,6 +15,17 @@ class Post(DetailView):
 
 def rate(request, pk):
 	post = myPost.objects.all().get(pk=pk)
-	post.changeRating(int(request.POST['mark']))
-	post.save()
+	mark = int(request.POST['mark'])
+	user = request.user
+	
+	try:
+		rated = RatedPost.objects.all().get(user=user, post=post)
+		post.changeRating(-rated.mark)
+	except:
+		rated = RatedPost(user=user, post=post)
+
+	post.changeRating(mark)
+	rated.mark = mark
+	rated.save()
+
 	return HttpResponseRedirect(request.META['HTTP_REFERER'])

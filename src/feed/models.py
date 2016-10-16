@@ -27,4 +27,10 @@ class Post(models.Model):
 
 	def changeRating(self, mark):
 		self.rating += mark
+		self.save()
+
+class RatedPost(models.Model):
+	user = models.ForeignKey(User)
+	post = models.ForeignKey(Post)
+	mark = models.IntegerField()
 
