@@ -25,3 +25,6 @@ class Post(models.Model):
 	def inDetails(self):
 		return str(self.entry) + '\n(' + str(self.author) + ')'
 
+	def changeRating(self, mark):
+		self.rating += mark
+

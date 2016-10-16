@@ -30,7 +30,7 @@
             <th width=15% align="left"> 
               <p>{{user}}</p> 
               <p>{% if user.is_staff %} Admin {% else %} Plain user {% endif %} </p>
-              <p> <form action="/logout/"> {% csrf_token %} <button type="submit" class="btn">Log out</button> </form> </p>
+              <p> <form action="/logout/"> {% csrf_token %} <button type="submit" class="btn">Logout</button> </form> </p>
             </th>
           {% else %}
             <th width=25% align="center"> <form class="user-info" action="/login/" method="post"> {% csrf_token %}

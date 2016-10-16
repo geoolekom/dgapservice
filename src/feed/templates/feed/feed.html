@@ -12,6 +12,11 @@
 		<tr> <h2>
 			<th align="left" width="80%"> <a href="{% url 'detail' post.id %}"> {{post.title}} </a> </th>
 			<th class="post-rating" align="center" rowspan="2"> {{post.rating}} </th>
+			<th rowspan="2"> <form action="/rate/{{ post.id }}" method="post"> 
+				{% csrf_token %} 
+				<p> <button type="submit" class="btn" name="mark" value="1"> + </button> </p>
+				<p> <button type="submit" class="btn" name="mark" value="-1">--	</button> </p>
+			</form> </th>
 		</h2> </tr>
 		<tr>
 			<td> <p> {{post.summary}} </p> </td>
