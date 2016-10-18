@@ -2,6 +2,13 @@
 
 {% block title %} Newsfeed {% endblock %}
 
+{% block menus %}
+	<li class="active"><a href="/feed">Feed</a></li>
+	<li><a href="/shedule/{{ user.group }}">Shedule</a></li>
+	<li><a href="/laundry">Laundry</a></li> 
+	<li><a href="/food">Food</a></li>
+{% endblock %}
+
 {% block content %}
 
 	<div class="header">
@@ -25,7 +32,8 @@
 						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
 					{% elif user in post.dislikedBy %}
 						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
-						<button type="button" class="btn btn-block btn-danger" name="mark" value="-1"> <b>-</b> </button> 
+						<button type="button" class="btn btn-block btn-danger" name="mark" value="-1"> <b>-</b> </button>
+					{% elif not user.is_authenticated %}
 					{% else %}
 						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
 						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>

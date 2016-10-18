@@ -6,10 +6,13 @@ class Service(models.Model):
 	user = models.ForeignKey(settings.AUTH_USER_MODEL, parent_link=True, default=1)
 	date = models.DateTimeField(auto_now=True)
 
-class Print(models.Model):      
+class Print(models.Model):
 	service = models.OneToOneField(Service, parent_link=True)
 
-	document = models.FileField(upload_to='documents/')
+	def document_path(instance, filename):
+		return 'documents/{0}/{1}'.format(instance.service.user.username, filename)
+
+	document = models.FileField(upload_to=document_path)
 	printer = models.IntegerField(blank=True, null=True)
 
 class FoodDelievery(models.Model):

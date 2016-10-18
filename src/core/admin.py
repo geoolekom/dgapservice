@@ -2,7 +2,6 @@ from .forms import AdminUserChangeForm, AdminUserAddForm
 from .models import User
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from feed.models import Post
 
 class UserAdmin(BaseUserAdmin):
     form = AdminUserChangeForm
