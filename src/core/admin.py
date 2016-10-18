@@ -14,15 +14,15 @@ class UserAdmin(BaseUserAdmin):
         'first_name',
         'last_name',
         'email',
+        'group',
         'avatar',
     )}), )
 
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'password', 'avatar')}
+            'fields': ('username', 'group', 'email', 'password', 'avatar')}
         ),
     )
 
 admin.site.register(User, UserAdmin)
-admin.site.register(Post)

@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+
+{% block title %} Shedule {% endblock %}
+
+{% block content %} 
+
+<table class="table table-bordered">
+
+	<thead>
+		<tr>
+			<th>Lesson number</th>
+			<th>Classroom</th>
+			<th>Lesson</th>
+			<th>Teacher</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for lesson in object_list %}
+		<tr>
+			<td> {{ lesson.lesson_number }} </td>
+			<td> {{ lesson.room }} </td>
+			<td> {{ lesson.lesson_title }} </td>
+			<td> {{ lesson.teacher }} </td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

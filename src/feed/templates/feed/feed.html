@@ -8,21 +8,39 @@
 		<h1>Newsfeed</h1>
 	</div>
 	{% for post in object_list %}
-		<div class="post"> <table width="100%">
-		<tr> <h2>
-			<th align="left" width="80%"> <a href="{% url 'detail' post.id %}"> {{post.title}} </a> </th>
-			<th class="post-rating" align="center" rowspan="2"> {{post.rating}} </th>
-			<th rowspan="2"> <form action="/rate/{{ post.id }}" method="post"> 
-				{% csrf_token %} 
-				<p> <button type="submit" class="btn" name="mark" value="1"> + </button> </p>
-				<p> <button type="submit" class="btn" name="mark" value="-1">--	</button> </p>
-			</form> </th>
-		</h2> </tr>
-		<tr>
-			<td> <p> {{post.summary}} </p> </td>
-		</tr>
+		<div class="panel-default">
+			
+			<div class="panel-heading">
+			<table width="100%">
+			<tr> 
+				<th align="left" width="80%"> <a href="{% url 'detail' post.id %}"> 
+					<h2>  {{post.title}} </h2>
+				</a> </th>
 
-		</table> </div>
+				<th width=10% class="post-rating" align="center" rowspan="2"> {{post.rating}} </th>
+				<th width=5% rowspan="2"> <form action="rate/{{ post.id }}" method="post"> 
+					{% csrf_token %}
+					{% if user in post.likedBy %}
+						<button type="button" class="btn btn-block btn-success" name="mark" value="1"> <b>+</b> </button> 
+						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
+					{% elif user in post.dislikedBy %}
+						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
+						<button type="button" class="btn btn-block btn-danger" name="mark" value="-1"> <b>-</b> </button> 
+					{% else %}
+						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
+						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
+					{% endif %}
+				</form> </th>
+			</tr>
+			</table>
+			</div>
+
+			<div class="panel-body">
+				<div class="panel-body"> <p> {{post.summary | safe}} </p>
+			</div>
+
+			
+		</div>
 	{% endfor %}
 
 {% endblock %}
