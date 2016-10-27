@@ -2,13 +2,6 @@
 
 {% block title %} Newsfeed {% endblock %}
 
-{% block menus %}
-	<li class="active"><a href="/feed">Feed</a></li>
-	<li><a href="/shedule/{{ user.group }}">Shedule</a></li>
-	<li><a href="/laundry">Laundry</a></li> 
-	<li><a href="/food">Food</a></li>
-{% endblock %}
-
 {% block content %}
 
 	<div class="header">
@@ -20,7 +13,7 @@
 			<div class="panel-heading">
 			<table width="100%">
 			<tr> 
-				<th align="left" width="80%"> <a href="{% url 'detail' post.id %}"> 
+				<th align="left" width="80%"> <a href="{% url 'feed:detail' post.id %}"> 
 					<h2>  {{post.title}} </h2>
 				</a> </th>
 

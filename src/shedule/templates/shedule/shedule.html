@@ -1,37 +1,54 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %} Shedule {% endblock %}
 
-{% block menus %}
-	<li><a href="/feed">Feed</a></li>
-	<li class="active"><a href="/shedule/{{ user.group }}">Shedule</a></li>
-	<li><a href="/laundry">Laundry</a></li> 
-	<li><a href="/food">Food</a></li>
-{% endblock %}
-
 {% block content %} 
 
-<table class="table table-bordered">
+<form method="get" class="form-inline">
+	{% bootstrap_form_errors form %}
+	{% bootstrap_form form %}
+	<input class="btn btn-default btn-active" type="submit" value="Показать расписание!">
+</form>
 
-	<thead>
-		<tr>
-			<th>Lesson number</th>
-			<th>Classroom</th>
-			<th>Lesson</th>
-			<th>Teacher</th>
-		</tr>
-	</thead>
+{% if object_list.count == 0 %}
+	<div class="alert alert-danger fade in"> 
+		<strong> У выбранной группы нет расписания. </strong>
+		<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	</div> 
+	
+{% else %}
 
-	<tbody>
-		{% for lesson in object_list %}
-		<tr>
-			<td> {{ lesson.lesson_number }} </td>
-			<td> {{ lesson.room }} </td>
-			<td> {{ lesson.lesson_title }} </td>
-			<td> {{ lesson.teacher }} </td>
-		</tr>
-		{% endfor %}
-	</tbody>
-</table>
+	<table class="table table-bordered">
+
+		<thead>
+			<tr class="info">
+				<th width="3%">№</th>
+				<th width="8%">Аудитория</th>
+				<th width="40%">Предмет</th>
+				<th width="20%">Преподаватель</th>
+				<th> </th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for day in days_of_week %}
+				<tr> <td align="center"> <strong> {{ day }} </strong> </td> </tr>
+				{% for lesson in object_list %}
+					{% if lesson.day_of_week == day %}
+						<tr class="success">
+							<td align="center"> {{ lesson.lesson_number }} </td>
+							<td align="center"> {{ lesson.room }} </td>
+							<td> {{ lesson.lesson_title }} </td>
+							<td> {{ lesson.teacher }} </td>
+						</tr>
+					{% endif %}
+				{% endfor %}
+
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endif %}
 
 {% endblock %}

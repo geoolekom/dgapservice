@@ -17,12 +17,11 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from core.views import login, logout
 from feed.views import rate
-from shedule.views import shedule
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^feed/', include('feed.urls')),
-    url(r'^login/', login, name="Sign in"),
-    url(r'^logout/', logout, name="Logout"),
-    url(r'^shedule/(?P<group_id>\d+)', shedule, name="Shedule")
+    url(r'^feed/', include('feed.urls', namespace="feed")),
+    url(r'^login/', login, name="login"),
+    url(r'^logout/', logout, name="logout"),
+    url(r'^shedule/', include('shedule.urls', namespace='shedule'))
 ]

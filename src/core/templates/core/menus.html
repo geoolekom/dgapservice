@@ -1,0 +1,9 @@
+{% url 'feed:feed' as feed %}
+{% url 'shedule:shedule' as shedule %}
+{% url '/laundry' as laundry %}
+{% url '/food' as food %}
+
+<li class='{% if request.path == feed %}active{%endif%}'><a href='{{ feed }}'>Feed</a></li>
+<li class='{% if request.path == shedule %}active{%endif%}'><a href='{{ shedule }}'>Shedule</a></li>
+<li class='{% if request.path == laundry %}active{%endif%}'><a href='{{ laundry }}'>Laundry</a></li> 
+<li class='{% if request.path == food %}active{%endif%}'><a href='{{ food }}'>Food</a></li>

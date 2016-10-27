@@ -1,0 +1,50 @@
+!!! 5
+
+extends "core/base.html"
+
+block title
+	{{ post.title }}
+
+block menus
+
+	li.active
+		a(href="/feed") Feed
+	li
+		a(href="/shedule/{{ user.group }}") Shedule
+	li
+		a(href="/laundry") Laundry
+	li
+		a(href="/food") Food
+
+
+block content
+	div.panel.panel-default
+		div.panel-heading
+			table
+				tr
+					th(width="25%")
+						form(action="rate/{{ post.id }}" method="post")
+							{% csrf_token %} 
+							if user in post.likedBy
+								button(type="button", class="btn btn-block btn-success", name="mark", value="1")
+									b +
+								button(type="submit", class="btn btn-block btn-default", name="mark", value="-1")
+									b -
+							elif user in post.dislikedBy
+								button(type="submit", class="btn btn-block btn-default", name="mark", value="1")
+									b +
+								button(type="button", class="btn btn-block btn-danger", name="mark", value="-1")
+									b -
+							elif not user.is_authenticated
+								pass
+							else
+								button(type="submit", class="btn btn-block btn-default", name="mark", value="1")
+									b +
+								button(type="submit", class="btn btn-block btn-default", name="mark", value="-1")
+									b -
+					th(width="15%")
+					th(width="60%")
+						h2 {{ post.title }}
+
+		div.panel-body
+			p {{ post.inDetails | safe }}
