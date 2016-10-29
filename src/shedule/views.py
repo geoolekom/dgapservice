@@ -1,44 +1,42 @@
 from groups.models import FacultyGroup as Group
 from shedule.models import Shedule
 import datetime
-from django.http import HttpResponse
 from shedule.forms import GroupChoiceForm
 
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404
-	
+
+
 class SheduleListView(ListView):
+	template_name = 'shedule/shedule.html'
+	today = datetime.date.today().weekday() + 1
 
-    template_name = "shedule/shedule.html"
-    day = datetime.date.today()
+	def dispatch(self, request, *args, **kwargs):
+		try:
+			self.request.GET['group']
+			self.form = GroupChoiceForm(self.request.GET)
+		except KeyError:
+			try:
+				group = str(self.request.user.group)
+				self.form = GroupChoiceForm({'group': group})
+			except:
+				self.form = GroupChoiceForm()
+		return super(SheduleListView, self).dispatch(request, args, kwargs)
 
-    def get_form(self):
-    	try:
-    		group = self.request.GET['group']
-    		form = GroupChoiceForm(self.request.GET)
-    	except:
-    		try:
-    			group = str(self.request.user.group)
-    			form = GroupChoiceForm({'group': group})
-    		except:
-    			form = GroupChoiceForm()
-    	return form
+	def get_queryset(self):
 
-    def get_queryset(self):
+		form = self.form
+		if form.is_valid():
+			group = Group.objects.get(group_number=form.cleaned_data['group'])
+			return Shedule.objects.filter(group=group)
+		else:
+			return Shedule.objects.none()
 
-    	form = self.get_form()
-
-    	if form.is_valid():
-    		group = Group.objects.get(group_number=form.cleaned_data['group'])
-    		return Shedule.objects.filter(group=group)
-    	else:
-    		return Shedule.objects.none()
-
-    def get_context_data(self, **kwargs):
-    	parent = super(SheduleListView, self)
-    	context = parent.get_context_data(**kwargs)
-    	context['form'] = self.get_form()
-    	context['days_of_week'] = range(1,8)
-
-    	return context
+	def get_context_data(self, **kwargs):
+		parent = super(SheduleListView, self)
+		context = parent.get_context_data(**kwargs)
+		context['form'] = self.form
+		context['days_of_week'] = range(1, 7)
+		context['today'] = self.today
+		return context
 

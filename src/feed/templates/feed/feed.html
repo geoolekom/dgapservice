@@ -4,44 +4,37 @@
 
 {% block content %}
 
-	<div class="header">
-		<h1>Newsfeed</h1>
+	<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-10">
+				<div class="header"> <h2>Newsfeed</h2> </div>
+			</div>
+
+			<div class="col-sm-1"> </div>
 	</div>
 	{% for post in object_list %}
-		<div class="panel-default">
-			
-			<div class="panel-heading">
-			<table width="100%">
-			<tr> 
-				<th align="left" width="80%"> <a href="{% url 'feed:detail' post.id %}"> 
-					<h2>  {{post.title}} </h2>
-				</a> </th>
 
-				<th width=10% class="post-rating" align="center" rowspan="2"> {{post.rating}} </th>
-				<th width=5% rowspan="2"> <form action="rate/{{ post.id }}" method="post"> 
-					{% csrf_token %}
-					{% if user in post.likedBy %}
-						<button type="button" class="btn btn-block btn-success" name="mark" value="1"> <b>+</b> </button> 
-						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
-					{% elif user in post.dislikedBy %}
-						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
-						<button type="button" class="btn btn-block btn-danger" name="mark" value="-1"> <b>-</b> </button>
-					{% elif not user.is_authenticated %}
-					{% else %}
-						<button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
-						<button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
-					{% endif %}
-				</form> </th>
-			</tr>
-			</table>
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-10">
+
+				<div class="panel-default">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-sm-10"> <a href="{% url 'feed:detail' post.id %}"> <h2> {{ post.title }} </h2> </a> </div>
+							<div class="col-sm-1 post-rating" align="right"> <b> {{ post.rating }} </b> </div>
+							<div class="col-sm-1" align="right">  {% include 'feed/rate_form.html' %}  </div>
+						</div>
+					</div>
+					<div class="panel-body">
+						<p> {{ post.summary | safe }} </p>
+					</div>
+				</div>
+
 			</div>
-
-			<div class="panel-body">
-				<div class="panel-body"> <p> {{post.summary | safe}} </p>
-			</div>
-
-			
+			<div class="col-sm-1"></div>
 		</div>
+
 	{% endfor %}
 
 {% endblock %}

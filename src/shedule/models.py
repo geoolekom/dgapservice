@@ -9,16 +9,17 @@ from dgapservice.settings import STATIC_ROOT
 import os
 import xlrd
 
+
 class Shedule(models.Model):
 	group = models.ForeignKey(Group)
 	day_of_week = models.IntegerField(default=1, validators=[
-            MaxValueValidator(7),
-            MinValueValidator(1)
-        ])
+		MaxValueValidator(7),
+		MinValueValidator(1)
+	])
 	lesson_number = models.IntegerField(default=1, validators=[
-            MaxValueValidator(7),
-            MinValueValidator(1)
-        ])
+		MaxValueValidator(7),
+		MinValueValidator(1)
+	])
 	lesson_title = models.CharField(max_length=50)
 	teacher = models.CharField(max_length=50)
 	room = models.CharField(max_length=10)
@@ -26,6 +27,7 @@ class Shedule(models.Model):
 	def __str__(self):
 		return str(self.group) + ": day " + str(self.day_of_week) + ", lesson " + str(self.lesson_number) + '.\t' + str(self.lesson_title)
 
+	@staticmethod
 	def refill():
 		os.chdir(STATIC_ROOT + 'shedule/xls')
 		files = os.listdir()
@@ -51,20 +53,27 @@ class Shedule(models.Model):
 					if lesson_number == 8:
 						lesson_number = 1
 						day_of_week += 1
+
 					for i in range(2, len(row)):
 						try:
 							group_number = groups[i]
 							group, created = Group.objects.get_or_create(group_number=group_number, year=2016)
-							print(group)
 
-							if row[i] == '':
+							if row[i] == '' and row[1] != '':
 								lesson_title = ''
 								teacher = ''
 								room = ''
+								shedule = Shedule(group=group,
+									day_of_week=day_of_week,
+									lesson_number=lesson_number,
+									lesson_title=lesson_title,
+									teacher=teacher,
+									room=room)
+								shedule.save()
 							else:
-								if len(row[i].split('/')) == 3:
+								if len(row[i].split('/')) >= 3:
 									lesson_title, teacher, room = row[i].split('/')
-								elif len(row[i].split(' ')) > 1:
+								elif len(row[i].split(' ')) >= 3 and row[i].split(' ')[-2].isnumeric():
 									lesson_title = ' '.join(row[i].split(' ')[:-2])
 									room = ' '.join(row[i].split(' ')[-2:])
 									teacher = ''
@@ -74,9 +83,8 @@ class Shedule(models.Model):
 									room = ''
 
 								try:
-									shedule = Shedule.objects.filter(group=group, day_of_week=day_of_week, lesson_number=lesson_number).delete()
-							#		print('Updating! ', shedule, ' to ', end='\t')
-									shedule = Shedule.objects.create(group=group, 
+									Shedule.objects.filter(group=group, day_of_week=day_of_week, lesson_number=lesson_number).delete()
+									Shedule.objects.create(group=group,
 										day_of_week=day_of_week,
 										lesson_number=lesson_number,
 										lesson_title=lesson_title,
@@ -90,7 +98,6 @@ class Shedule(models.Model):
 										teacher=teacher,
 										room=room)
 									shedule.save()
-							#	print(shedule)
 						except:
 							pass
 

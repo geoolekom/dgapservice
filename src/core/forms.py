@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.hashers import make_password
 
+
 class AdminUserAddForm(UserCreationForm):
 
 	class Meta:
@@ -17,12 +18,21 @@ class AdminUserAddForm(UserCreationForm):
 			return username
 		raise forms.ValidationError(self.error_messages['Username is used.'])
 
-	def clean_password(self):
+	@staticmethod
+	def clean_password():
 		password = make_password("password")
 		return password
+
 
 class AdminUserChangeForm(UserChangeForm):
 
 	class Meta:
 		model = User
 		fields = ("username", "email", "password", "avatar")
+
+
+class RegistrationForm(UserCreationForm):
+
+	class Meta:
+		model = User
+		fields = ("username", "first_name", "last_name", "group", "email", "avatar")

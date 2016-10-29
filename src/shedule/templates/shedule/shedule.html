@@ -18,36 +18,51 @@
 	</div> 
 	
 {% else %}
+	<ul class="nav nav-tabs">
+		{% for day in days_of_week %}
+			<li class="{% if day == today %} active {% endif %}"> <a data-toggle="tab" href="#{{ day }}"> {{ day }} </a> </li>
+		{% endfor %}
+	</ul>
 
-	<table class="table table-bordered">
+	<div class="tab-content">
 
-		<thead>
-			<tr class="info">
-				<th width="3%">№</th>
-				<th width="8%">Аудитория</th>
-				<th width="40%">Предмет</th>
-				<th width="20%">Преподаватель</th>
-				<th> </th>
-			</tr>
-		</thead>
+		{% for day in days_of_week %}
+			<div id="{{day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
 
-		<tbody>
-			{% for day in days_of_week %}
-				<tr> <td align="center"> <strong> {{ day }} </strong> </td> </tr>
-				{% for lesson in object_list %}
-					{% if lesson.day_of_week == day %}
-						<tr class="success">
-							<td align="center"> {{ lesson.lesson_number }} </td>
-							<td align="center"> {{ lesson.room }} </td>
-							<td> {{ lesson.lesson_title }} </td>
-							<td> {{ lesson.teacher }} </td>
-						</tr>
-					{% endif %}
-				{% endfor %}
+				<div class="row">
+					<div class="col-sm-7">
+						<table class="table table-bordered">
 
-			{% endfor %}
-		</tbody>
-	</table>
+							<thead>
+								<tr class="info">
+									<th width="3%">№</th>
+									<th width="8%">Аудитория</th>
+									<th width="30%">Предмет</th>
+									<th width="15%">Преподаватель</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								{% for lesson in object_list %}
+								{% if lesson.day_of_week == day %}
+								<tr class="success">
+									<td align="center"> {{ lesson.lesson_number }} </td>
+									<td align="center"> {{ lesson.room }} </td>
+									<td> {{ lesson.lesson_title }} </td>
+									<td> {{ lesson.teacher }} </td>
+								</tr>
+								{% endif %}
+								{% endfor %}
+							</tbody>
+
+						</table>
+					</div>
+					<div class="col-sm-5"></div>
+
+				</div>
+			</div>
+		{% endfor %}
+	</div>
 
 {% endif %}
 

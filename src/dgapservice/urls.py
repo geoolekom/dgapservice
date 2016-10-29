@@ -16,12 +16,13 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from core.views import login, logout
-from feed.views import rate
+from core.views import RegisterView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^feed/', include('feed.urls', namespace="feed")),
     url(r'^login/', login, name="login"),
     url(r'^logout/', logout, name="logout"),
-    url(r'^shedule/', include('shedule.urls', namespace='shedule'))
+    url(r'^register/', RegisterView.as_view(), name="register"),
+    url(r'^shedule/', include('shedule.urls', namespace='shedule')),
 ]
