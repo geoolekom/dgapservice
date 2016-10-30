@@ -1,17 +1,12 @@
-.navbar-inverse {
-	position: fixed !important;
+.navbar {
 	z-index: 100;
 	width: 100%;
 	opacity: 0.9;
-	height: 120px;
+	display: block;
+	height: 52px;
 }
 
-.btn-primary {
-	background-color: blue;
-}
-
-.content {
-	padding-top: 130px;
+.container {
 	color: DimGray;
 	padding-left: 20px;
 	padding-right: 20px;
@@ -22,21 +17,45 @@
 	font-family: "Trebuchet MS", monospace;
 }
 
-.user-info {
-	padding: 10px;
+.avatar {
+    padding: 2px;
+    height: 48px;
 }
 
-.post {
-	background-color: NavajoWhite;
-	margin: 5px;
-	padding: 2px;
-	padding-left: 5px;
+.user-info {
+	padding-top: 8px;
+	padding-left: 10px;
+	padding-right: 10px;
+	line-height: 80%;
+	font-family: "Trebuchet MS", monospace;
+}
+
+.blocked {
+    display: block;
+}
+
+.header {
+    height: 50px;
+    padding-right: 20px;
+}
+
+.header-title {
+    margin-top: 3px;
+}
+
+.post-title {
+	height: 93px;
 }
 
 .post-rating {
 	font-family: "Trebuchet MS", monospace;
 	font-size: 36pt;
 	font-color: green;
+}
+
+.comment-title {
+    height: 42px;
+    vertical-align: middle;
 }
 
 a {
@@ -48,3 +67,9 @@ body {
 	padding: 0;
 	background-color: Lavender;
 }
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+

@@ -19,6 +19,7 @@ from core.views import login, logout
 from core.views import RegisterView
 
 urlpatterns = [
+    url(r'^', include('feed.urls', namespace="feed")),
     url(r'^admin/', admin.site.urls),
     url(r'^feed/', include('feed.urls', namespace="feed")),
     url(r'^login/', login, name="login"),

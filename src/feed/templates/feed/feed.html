@@ -1,40 +1,70 @@
 {% extends "core/base.html" %}
+{% load bootstrap3 %}
 
 {% block title %} Newsfeed {% endblock %}
 
 {% block content %}
 
-	<div class="row">
-			<div class="col-sm-1"></div>
-			<div class="col-sm-10">
-				<div class="header"> <h2>Newsfeed</h2> </div>
-			</div>
+	{% if object_list.count != 0 %}
 
-			<div class="col-sm-1"> </div>
-	</div>
-	{% for post in object_list %}
-
-		<div class="row">
-			<div class="col-sm-1"></div>
-			<div class="col-sm-10">
-
-				<div class="panel-default">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-sm-10"> <a href="{% url 'feed:detail' post.id %}"> <h2> {{ post.title }} </h2> </a> </div>
-							<div class="col-sm-1 post-rating" align="right"> <b> {{ post.rating }} </b> </div>
-							<div class="col-sm-1" align="right">  {% include 'feed/rate_form.html' %}  </div>
-						</div>
+		<div class="row blocked header">
+			<div class="col-sm-4">
+				<form class="form-inline">
+					<div class="form-group">
+						<select class="form-control" id="sort" name="sort">
+							<option value="1">По дате добавления</option>
+							<option value="2">По рейтингу</option>
+						</select>
+						<button class="btn btn-link"><span class="glyphicon glyphicon-filter"></span></button>
 					</div>
-					<div class="panel-body">
-						<p> {{ post.summary | safe }} </p>
-					</div>
-				</div>
-
+				</form>
 			</div>
-			<div class="col-sm-1"></div>
+			<div class="col-sm-5">
+				<div> <h2 class="header-title">  </h2> </div>
+			</div>
+			<div class="col-sm-3">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<input type="text" class="form-control" name="searchstr" placeholder="Поиск" val="" id="srch">
+					</div>
+				</form>
+			</div>
 		</div>
 
-	{% endfor %}
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="panel-group">
+					{% for post in object_list %}
+					<div class="panel panel-default">
+						<div class="panel-heading blocked post-title">
+							<div class="row">
+								<div class="col-sm-10"> <a href="{% url 'feed:detail' post.id %}"> <h2> {{ post.title }} </h2> </a> </div>
+								<div class="col-sm-1 post-rating" align="right"> <b> {{ post.rating }} </b> </div>
+								<div class="col-sm-1" align="right">  {% include 'feed/rate_form.html' %}  </div>
+							</div>
+						</div>
+						<div class="panel-body">
+							<p> {{ post.summary | safe }} </p>
+						</div>
+					</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+
+	{% else %}
+		<div class="row">
+			<div class="col-sm-9">
+				<div class="header"> <h2> Нет подходящих постов. </h2> </div>
+			</div>
+			<div class="col-sm-3">
+				<form class="form form-inline">
+					<input type="text" class="form-control" placeholder="Поиск"  name="searchstr" val="">
+				</form>
+			</div>
+		</div>
+
+
+	{% endif %}
 
 {% endblock %}
