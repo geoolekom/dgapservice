@@ -1,22 +1,35 @@
 {% load bootstrap3 %}
 
+
 {% if user.is_authenticated %}
 
-  <li class="user-info" align="right">
-    <p class="text-muted"> <strong>
-        {% if user.get_full_name %} {{user.get_full_name}} {%else%} {{user}} {% endif %}
-    </strong> </p>
-    <p class="text-muted"> <strong>
-        {% if user.is_staff %} администратор {% else %} пользователь {% endif %}
-    </strong> </p>
-  </li>
-    <li> <img class="avatar" src="{{ user.avatar.url }}" border=2> </li>
-  <li>
-      <form class="navbar-form pull-right" action="/logout/">
-          {% csrf_token %} <button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-log-out"></button>
-      </form>
-  </li>
+  <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+          <strong> {% if user.get_full_name %} {{user.get_full_name}} {%else%} {{user}} {% endif %} </strong>
+          <span class="caret"></span>
+      </a>
+        <ul class="dropdown-menu list-group" role="menu">
+            <li class="dropdown-header">Информация о пользователе</li>
+            <li class="list-group-item">
+                <p class="list-group-item-text" align="right">
+                    {% if user.is_staff %} Администратор
+                    {% else %} Студент
+                    {% endif %}
+                </p>
+                <p class="list-group-item-text" align="right">
+                    Группа {{user.group}}
+                </p>
+            </li>
+            <li class="list-group-item">
+                {% if user.avatar %} <img src="{{ user.avatar.url }}" border=2>
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                <a class="list-group-item-text" href="/logout/"  align="right">Выйти</a>
+            </li>
+        </ul>
 
+  </li>
 
 {% else %}
 
