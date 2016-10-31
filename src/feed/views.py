@@ -1,12 +1,13 @@
 from feed.models import Post as myPost
 from feed.models import RatedPost, Comment
 from django.http import HttpResponseRedirect, HttpResponse
-from django.views.generic.detail import DetailView
+from django.views.generic import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from .forms import AddCommentForm
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from .forms import *
+from django.shortcuts import redirect, get_object_or_404, render
+from django import forms
+from django.utils.decorators import method_decorator
 
 
 class Feed(ListView):
@@ -27,27 +28,7 @@ class Feed(ListView):
 				pass
 		else:
 			pass
-
 		return queryset
-
-
-class Post(DetailView):
-	template_name = 'feed/post.html'
-	model = myPost
-	add_comment_form = AddCommentForm()
-
-	def get_context_data(self, **kwargs):
-		parent = super(Post, self)
-		context = parent.get_context_data(**kwargs)
-		context['comments'] = self.get_object().comment_set.all()
-		context['add_comment_form'] = self.add_comment_form
-		return context
-
-	def render_to_response(self, context, **response_kwargs):
-		self.add_comment_form.author = self.request.user
-		self.add_comment_form.post = self.get_object()
-		self.add_comment_form.save()
-		return super(Post, self).render_to_response(context, **response_kwargs)
 
 
 class PostDetail(CreateView):
@@ -76,6 +57,27 @@ class PostDetail(CreateView):
 		return redirect(self.request.META['HTTP_REFERER'])
 
 
+class AddPost(CreateView):
+	template_name = 'feed/post_form.html'
+	model = myPost
+	fields = ('title', 'entry',)
+
+	def get_context_data(self, **kwargs):
+		context = super(AddPost, self).get_context_data(**kwargs)
+		context['editing_title'] = 'Новый пост'
+		return context
+
+	def form_valid(self, form):
+		if form.is_valid():
+			post = form.save(commit=False)
+			post.author = self.request.user
+			post.rating = 0
+			post.save()
+			return redirect('/feed/' + str(post.id))
+		else:
+			return render(self.request, self.template_name, {'form': form})
+
+
 class Delete(DeleteView):
 	template_name = 'feed/post.html'
 	model = Comment
@@ -85,8 +87,8 @@ class Delete(DeleteView):
 		if 'comment' in self.request.POST:
 			pk = self.request.POST['comment']
 			obj = Comment.objects.get(pk=pk, author=self.request.user)
-		elif 'post' in self.request.POST:
-			pk = self.request.POST['post']
+		elif 'mypost' in self.request.POST:
+			pk = self.request.POST['mypost']
 			obj = myPost.objects.get(pk=pk, author=self.request.user)
 		else:
 			pass
@@ -96,16 +98,44 @@ class Delete(DeleteView):
 		return self.request.META['HTTP_REFERER']
 
 
-class UpdateComment(PostDetail):
+class EditPost(UpdateView):
+	template_name = 'feed/post_form.html'
+	model = myPost
+	form_class = AddPostForm
 
 	def dispatch(self, request, *args, **kwargs):
-
-		self.related_comment = get_object_or_404(Comment, pk=request.POST['comment'], author=request.user)
-		pk = self.related_comment.post.id
-		return super(UpdateComment, self).dispatch(request, pk=pk, *args, **kwargs)
+		self.object = get_object_or_404(myPost, author=request.user, pk=request.POST['mypost'])
+		return super(EditPost, self).dispatch(request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
-		context = super(UpdateComment, self).get_context_data(pk=self.related_comment.post.id, **kwargs)
+		context = super(EditPost, self).get_context_data(**kwargs)
+		context['form'] = AddPostForm({'title': self.object.title, 'entry': self.object.entry})
+		context['editing_title'] = self.object.title
+		return context
+
+	def get_object(self, queryset=None):
+		return self.object
+
+	def form_valid(self, form):
+		if form.is_valid:
+			post = form.save(commit=False)
+			post.author = self.request.user
+			post.rating = 0
+			post.save()
+			return redirect('/feed/' + str(self.object.id))
+		else:
+			return render(self.request, self.template_name, {'form': form})
+
+
+class EditComment(PostDetail):
+
+	def dispatch(self, request, *args, **kwargs):
+		self.related_comment = get_object_or_404(Comment, pk=request.POST['comment'], author=request.user)
+		pk = self.related_comment.post.id
+		return super(EditComment, self).dispatch(request, pk=pk, *args, **kwargs)
+
+	def get_context_data(self, **kwargs):
+		context = super(EditComment, self).get_context_data(pk=self.related_comment.post.id, **kwargs)
 		pk = self.related_comment.id
 		context['editing'] = int(pk)
 		context['form'] = AddCommentForm({'entry': self.related_comment.entry})
@@ -115,9 +145,6 @@ class UpdateComment(PostDetail):
 		setattr(self.related_comment, 'entry', form.cleaned_data['entry'])
 		self.related_comment.save()
 		return redirect('/feed/' + str(self.related_comment.post.id))
-
-class UpdatePost(PostDetail):
-	pass
 
 
 def rate(request, pk):

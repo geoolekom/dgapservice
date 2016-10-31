@@ -2,6 +2,7 @@ from core.models import User
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.forms import AuthenticationForm
 
 
 class AdminUserAddForm(UserCreationForm):
@@ -36,3 +37,7 @@ class RegistrationForm(UserCreationForm):
 	class Meta:
 		model = User
 		fields = ("username", "first_name", "last_name", "group", "email", "avatar")
+
+
+class LoginForm(AuthenticationForm):
+	pass

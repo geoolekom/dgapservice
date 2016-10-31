@@ -6,13 +6,13 @@ from django.conf import settings
 
 
 class Post(models.Model):
-	title = models.CharField('Title', max_length=200)
-	entry = models.TextField('Content')
+	title = models.CharField(verbose_name='Заголовок', max_length=200)
+	entry = models.TextField(verbose_name="Текст поста")
 	author = models.ForeignKey(settings.AUTH_USER_MODEL, parent_link=True)
-	rating = models.IntegerField('Rating', default=0)
+	rating = models.IntegerField('Рейтинг', default=0)
 
-	pub_time = models.DateTimeField('Pubication time', auto_now_add=True)
-	upd_time = models.DateTimeField('Last update', auto_now=True)
+	pub_time = models.DateTimeField('Время публикации', auto_now_add=True)
+	upd_time = models.DateTimeField('Последнее изменение', auto_now=True)
 
 	def __str__(self):
 		return self.title
@@ -49,8 +49,8 @@ class Comment(models.Model):
 	entry = models.TextField(verbose_name='Комментарий')
 	post = models.ForeignKey(Post, parent_link=True)
 
-	pub_time = models.DateTimeField('Pubication time', auto_now_add=True)
-	upd_time = models.DateTimeField('Last update', auto_now=True)
+	pub_time = models.DateTimeField('Время публикации', auto_now_add=True)
+	upd_time = models.DateTimeField('Последнее изменение', auto_now=True)
 
 	def __str__(self):
 		return self.post + ":\t" + self.entry

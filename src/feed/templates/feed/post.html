@@ -35,7 +35,7 @@
 									<form method="post" class="form-inline">
 										{% csrf_token %}
 										<input type="text" name="comment" value="{{comment.id}}" hidden>
-										<button formaction="edit" class="btn btn-xs btn-link"><span class="glyphicon glyphicon-pencil"></span></button>
+										<button formaction="edit-comment" class="btn btn-xs btn-link"><span class="glyphicon glyphicon-pencil"></span></button>
 										<button formaction="delete" class="btn btn-xs btn-link"><span class="glyphicon glyphicon-remove"></span></button>
 									</form>
 								{% endif %}
@@ -44,7 +44,7 @@
 					</div>
 					<div class="panel-body">
 						{% if user.is_authenticated and editing == comment.id %}
-							{% include "feed/edit_comment_form.html" %}
+							{% include "feed/comment_form.html" %}
 						{% else %}
 							{{ comment.entry | safe }}
 						{% endif %}
@@ -56,7 +56,7 @@
 		<div class="col-sm-1"></div>
 	</div>
 	{% if user.is_authenticated and editing == 0 %}
-		{% include "feed/add_comment_form.html" %}
+		{% include "feed/comment_form.html" %}
 	{% endif %}
 
 {% endblock %}

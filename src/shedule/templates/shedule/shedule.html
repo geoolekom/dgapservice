@@ -6,8 +6,8 @@
 {% block content %} 
 
 <form method="get" class="form-inline">
-	{% bootstrap_form_errors form %}
-	{% bootstrap_form form %}
+	{% bootstrap_form_errors shedule_form %}
+	{% bootstrap_form shedule_form %}
 	<input class="btn btn-default btn-active" type="submit" value="Показать расписание!">
 </form>
 
@@ -44,14 +44,14 @@
 
 							<tbody>
 								{% for lesson in object_list %}
-								{% if lesson.day_of_week == day %}
-								<tr class="success">
-									<td align="center"> {{ lesson.lesson_number }} </td>
-									<td align="center"> {{ lesson.room }} </td>
-									<td> {{ lesson.lesson_title }} </td>
-									<td> {{ lesson.teacher }} </td>
-								</tr>
-								{% endif %}
+									{% if lesson.day_of_week == day %}
+										<tr class="success">
+											<td align="center"> {{ lesson.lesson_number }} </td>
+											<td align="center"> {{ lesson.room }} </td>
+											<td> {{ lesson.lesson_title }} </td>
+											<td> {{ lesson.teacher }} </td>
+										</tr>
+									{% endif %}
 								{% endfor %}
 							</tbody>
 

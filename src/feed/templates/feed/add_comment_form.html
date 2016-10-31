@@ -1,8 +1,0 @@
-{% load bootstrap3 %}
-
-<form method="post" class="form" enctype="multipart/form-data">
-	{% csrf_token %}
-    {% bootstrap_form_errors form %}
-	{% bootstrap_field form.entry show_label=False %}
-	<input class="btn btn-primary btn-active" type="submit" value="Добавить коммент">
-</form>
