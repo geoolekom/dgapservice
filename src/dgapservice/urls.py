@@ -16,13 +16,14 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from core.views import *
+from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = [
-#    url(r'^', include('feed.urls', namespace="feed")),
+    url(r'^$', RedirectView.as_view(url=reverse_lazy('feed:feed'))),
     url(r'^admin/', admin.site.urls),
     url(r'^feed/', include('feed.urls', namespace="feed")),
     url(r'^login/', login, name="login"),
-    url(r'^logout/', LogoutView.as_view(), name="logout"),
+    url(r'^logout/', logout, name="logout"),
     url(r'^register/', RegisterView.as_view(), name="register"),
     url(r'^shedule/', include('shedule.urls', namespace='shedule')),
 ]

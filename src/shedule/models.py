@@ -101,4 +101,51 @@ class Shedule(models.Model):
 						except:
 							pass
 
+	@staticmethod
+	def json_refill():
+		import json
+		import requests
+
+		def get_as_list(url, name):
+			try:
+				ret = requests.get(url, stream=True).json()[name]
+				return ret
+			except TypeError:
+				return []
+			except KeyError:
+				return []
+
+
+		faculties = get_as_list("https://mipt.ru/api/schedule/get_faculties", 'faculties')
+		for faculty in faculties:
+			print(faculty['faculty_name'])
+			groups = get_as_list("https://mipt.ru/api/schedule/get_groups?faculty_id=" + str(faculty['faculty_id']), 'groups')
+			for group in groups:
+				group_instance, created = Group.objects.get_or_create(group_number=group['group_name'], year=2016)
+				days = get_as_list("https://mipt.ru/api/schedule/get_schedule?group_id=" + str(group['group_id']), 'days')
+				for day in days:
+					for i in range(1, len(day['lessons']) + 1):
+						Shedule.objects.filter(group=group_instance,
+						                       day_of_week=day['weekday'],
+						                       lesson_number=i).delete()
+						try:
+							teacher_name = day['lessons'][i-1]['teachers'][0]["teacher_name"]
+						except TypeError:
+							teacher_name = ''
+
+						try:
+							room = day['lessons'][i-1]['auditories'][0]["auditory_name"]
+						except TypeError:
+							room = ''
+
+						Shedule.objects.create(group=group_instance,
+						                       day_of_week=day['weekday'],
+						                       lesson_number=i,
+						                       lesson_title=day['lessons'][i-1]['subject'],
+						                       teacher=teacher_name,
+						                       room=room)
+
+		#   json.dumps(faculties, sort_keys=True, indent=4, ensure_ascii=False)
+
+
 

@@ -1,6 +1,5 @@
 {% load bootstrap3 %}
 
-
 {% if user.is_authenticated %}
 
   <li class="dropdown">
@@ -9,16 +8,36 @@
           <span class="caret"></span>
       </a>
         <ul class="dropdown-menu list-group" role="menu">
-            <li class="dropdown-header">Информация о пользователе</li>
+            <li class="dropdown-header">Пользовательские данные</li>
             <li class="list-group-item">
-                <p class="list-group-item-text" align="right">
-                    {% if user.is_staff %} Администратор
-                    {% else %} Студент
-                    {% endif %}
-                </p>
-                <p class="list-group-item-text" align="right">
-                    Группа {{user.group}}
-                </p>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <p class="list-group-item-text text-muted" align="left">
+                            статус
+                        </p>
+                        <p class="list-group-item-text text-muted" align="left">
+                            группа
+                        </p>
+                        <p class="list-group-item-text text-muted" align="left">
+                            счет
+                        </p>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="list-group-item-text">
+                            {% if user.is_staff %} Администратор
+                            {% else %} студент
+                            {% endif %}
+                        </p>
+                        <p class="list-group-item-text">
+                            {% if user.group is None %} без группы
+                            {% else %} {{user.group}}
+                            {% endif %}
+                        </p>
+                        <p class="list-group-item-text">
+                            {{ user.account.balance }}
+                        </p>
+                    </div>
+                </div>
             </li>
             <li class="list-group-item">
                 {% if user.avatar %} <img src="{{ user.avatar.url }}" border=2>
@@ -35,7 +54,6 @@
 
   <li>
     <form class="navbar-form pull-right form-inline" method="post"> {% csrf_token %}
-        <a class="text-muted"> {{ errors }} </a>
         <input class="form-control" type="text" name="username" id="username" placeholder="Логин" size="14">
         <input class="form-control" type="password" name="password1" id="password1" placeholder="Пароль" size="14">
 

@@ -7,45 +7,34 @@ from django.shortcuts import redirect, render
 from django.core.urlresolvers import resolve
 
 
-class LoginView(FormView):
-
-	def dispatch(self, request, *args, **kwargs):
-		self.form = LoginForm(request.POST)
-		return super(LoginView, self).dispatch(request, *args, **kwargs)
-
-	def get_context_data(self, **kwargs):
-		context = super(LoginView, self).get_context_data(**kwargs)
-		context['form'] = self.form
-		return context
-
-	def get_success_url(self):
-		return self.request.META['HTTP_REFERER']
-
-	def form_valid(self, form):
-		auth.login(self.request, form.get_user())
-		return super(LoginView, self).form_valid(form)
-
-
-class LogoutView(RedirectView):
-	def get(self, request, *args, **kwargs):
-		auth.logout(request)
-		return super(LogoutView, self).get(request, *args, **kwargs)
-
-	def get_redirect_url(self, *args, **kwargs):
-		return self.request.META['HTTP_REFERER']
+def logout(request):
+	auth.logout(request)
+	if 'HTTP_REFERER' in request.META:
+		return redirect(request.META['HTTP_REFERER'])
+	else:
+		return render(request, 'core/base.html',
+		        {'errors': 'Не надо пытаться разлогиниться через строку браузера!\t'})
 
 
 def login(request):
-	username = request.POST['username']
-	password = request.POST['password1']
-	user = auth.authenticate(username=username, password=password)
-
-	if user is not None and user.is_active:
-		auth.login(request, user)
-		return redirect(request.META['HTTP_REFERER'])
+	if 'HTTP_REFERER' in request.META:
+		redirect_url = request.META['HTTP_REFERER']
+		if 'username' in request.POST and 'password1' in request.POST:
+			username = request.POST['username']
+			password = request.POST['password1']
+			user = auth.authenticate(username=username, password=password)
+			if user is not None and user.is_active:
+				auth.login(request, user)
+				return redirect(redirect_url)
+			else:
+				return render(request, 'core/base.html',
+				              {'errors': 'Неправильное имя пользователя или пароль.\t'})
+		else:
+			return render(request, 'core/base.html',
+			       {'errors': 'Вы не ввели имя пользователя или пароль.\t'})
 	else:
-		return render(request, 'core/register.html', {'errors': 'Неправильное имя пользователя или пароль. Пройдите регистрацию.\t',
-		                                              'form': RegistrationForm(request.POST)})
+		return render(request, 'core/base.html',
+		       {'errors': 'Вы пришли непонятно откуда и не ввели имя пользователя и пароль.\t'})
 
 
 class RegisterView(CreateView):

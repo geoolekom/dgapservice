@@ -1,7 +1,6 @@
 from feed.models import Post as myPost
 from feed.models import RatedPost, Comment
-from django.http import HttpResponseRedirect, HttpResponse
-from django.views.generic import View
+from django.http import HttpResponseRedirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .forms import *
@@ -19,15 +18,13 @@ class Feed(ListView):
 		if 'searchstr' in self.request.GET:
 			searchstr = self.request.GET['searchstr']
 			queryset = queryset.filter(entry__icontains=searchstr)
-		elif 'sort' in self.request.GET:
+		if 'sort' in self.request.GET:
 			if self.request.GET['sort'] == '1':
 				queryset = queryset.order_by('-pub_time')
 			elif self.request.GET['sort'] == '2':
 				queryset = queryset.order_by('-rating')
 			else:
 				pass
-		else:
-			pass
 		return queryset
 
 
@@ -68,14 +65,11 @@ class AddPost(CreateView):
 		return context
 
 	def form_valid(self, form):
-		if form.is_valid():
-			post = form.save(commit=False)
-			post.author = self.request.user
-			post.rating = 0
-			post.save()
-			return redirect('/feed/' + str(post.id))
-		else:
-			return render(self.request, self.template_name, {'form': form})
+		post = form.save(commit=False)
+		post.author = self.request.user
+		post.rating = 0
+		post.save()
+		return redirect('/feed/' + str(post.id))
 
 
 class Delete(DeleteView):
@@ -148,8 +142,14 @@ class EditComment(PostDetail):
 
 
 def rate(request, pk):
-	post = myPost.objects.all().get(pk=pk)
-	mark = int(request.POST['mark'])
+	post = get_object_or_404(myPost, pk=pk)
+
+	if 'mark' in request.POST and abs(int(request.POST['mark'])) == 1:
+		mark = int(request.POST['mark'])
+	else:
+		return render(request, 'core/base.html',
+		        {'errors': 'Не надо пытаться химичить с оценками!\t'})
+
 	user = request.user
 	
 	try:
@@ -162,4 +162,4 @@ def rate(request, pk):
 	rated.mark = mark
 	rated.save()
 
-	return HttpResponseRedirect(request.META['HTTP_REFERER'])
+	return redirect(request.META['HTTP_REFERER'])

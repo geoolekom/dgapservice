@@ -7,3 +7,6 @@
 <li class='{% if request.path == shedule %}active{%endif%}'><a href='{{ shedule }}'>Расписание</a></li>
 <li class='{% if request.path == laundry %}active{%endif%}'><a href='#'>Прачечная</a></li>
 <li class='{% if request.path == food %}active{%endif%}'><a href='#'>Еда</a></li>
+{% if user.is_staff %}
+    <li class='{% if request.path == food %}active{%endif%}'><a href='/admin'>Админка</a></li>
+{% endif %}
