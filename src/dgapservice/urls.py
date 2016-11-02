@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^logout/', logout, name="logout"),
     url(r'^register/', RegisterView.as_view(), name="register"),
     url(r'^shedule/', include('shedule.urls', namespace='shedule')),
+    url(r'^services/', include('services.urls', namespace='services')),
 ]

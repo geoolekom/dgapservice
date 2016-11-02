@@ -18,7 +18,7 @@ class Shedule(models.Model):
 	])
 	lesson_title = models.CharField(verbose_name='Предмет', max_length=50, null=True, blank=True)
 	teacher = models.CharField(verbose_name='Преподаватель', max_length=50, null=True, blank=True)
-	room = models.CharField(verbose_name='Аудитория', max_length=10, null=True, blank=True)
+	room = models.CharField(verbose_name='Аудитория', max_length=20, null=True, blank=True)
 
 	def __str__(self):
 		return str(self.group) + ": day " + str(self.day_of_week) + ", lesson " + str(self.lesson_number) + '.\t' + str(self.lesson_title)

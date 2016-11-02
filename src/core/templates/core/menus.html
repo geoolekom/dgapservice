@@ -1,12 +1,14 @@
 {% url 'feed:feed' as feed %}
 {% url 'shedule:shedule' as shedule %}
-{% url '/laundry' as laundry %}
-{% url '/food' as food %}
+{% url 'services:laundry' as laundry %}
+{% url 'services:food' as food %}
+{% url 'services:print' as print %}
 
 <li class='{% if request.path == feed %}active{%endif%}'><a href='{{ feed }}'>Лента</a></li>
 <li class='{% if request.path == shedule %}active{%endif%}'><a href='{{ shedule }}'>Расписание</a></li>
-<li class='{% if request.path == laundry %}active{%endif%}'><a href='#'>Прачечная</a></li>
-<li class='{% if request.path == food %}active{%endif%}'><a href='#'>Еда</a></li>
+<li class='{% if request.path == print %}active{%endif%}'><a href='{{ print }}'>Печать</a></li>
+<li class='{% if request.path == laundry %}active{%endif%}'><a href='{{ laundry }}'>Прачечная</a></li>
+<li class='{% if request.path == food %}active{%endif%}'><a href='{{ food }}'>Еда</a></li>
 {% if user.is_staff %}
     <li class='{% if request.path == food %}active{%endif%}'><a href='/admin'>Админка</a></li>
 {% endif %}

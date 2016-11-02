@@ -19,17 +19,16 @@
 	
 {% else %}
 	<ul class="nav nav-tabs">
-		{% for day in days_of_week %}
-			<li class="{% if day == today %} active {% endif %}"> <a data-toggle="tab" href="#{{ day }}"> {{ day }} </a> </li>
+		{% for day, day_name in days_of_week.items %}
+			<li class="{% if day == today %} active {% endif %}"> <a data-toggle="tab" href="#{{ day }}"> {{ day_name }} </a> </li>
 		{% endfor %}
 	</ul>
 
 	<div class="tab-content">
-
-		{% for day in days_of_week %}
-			<div id="{{day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
-
+		{% for day, day_name in days_of_week.items %}
+			<div id="{{ day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
 				<div class="row">
+
 					<div class="col-sm-8">
 						<table class="table table-bordered">
 

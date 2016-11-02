@@ -43,7 +43,7 @@ class SheduleListView(ListView):
 		parent = super(SheduleListView, self)
 		context = parent.get_context_data(**kwargs)
 		context['group_form'] = self.group_form
-		context['days_of_week'] = range(1, 7)
+		context['days_of_week'] = {1: 'Понедельник', 2: 'Вторник', 3: 'Среда', 4: 'Четверг', 5: 'Пятница', 6: 'Суббота'}
 		context['today'] = self.today
 		context['edit_form'] = self.edit_form
 		return context
