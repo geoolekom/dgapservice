@@ -16,6 +16,11 @@ class BookListView(ListView):
 	def get_queryset(self):
 		if self.group_form.is_valid():
 			group = Group.objects.get(group_number=self.group_form.cleaned_data['group'])
-			return group.subjects
+			return group.subjects.all()
 		else:
 			return Subject.objects.none()
+
+	def get_context_data(self, **kwargs):
+		context = super(BookListView, self).get_context_data(**kwargs)
+		context['group_form'] = self.group_form
+		return context

@@ -1,7 +1,7 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
 
-{% block title %} Shedule {% endblock %}
+{% block title %} Расписание {% endblock %}
 
 {% block content %} 
 
@@ -11,7 +11,7 @@
 	<input class="btn btn-default btn-active" type="submit" value="Показать расписание!">
 </form>
 
-{% if object_list.count == 0 %}
+{% if not object_list %}
 	<div class="alert alert-danger fade in"> 
 		<strong> У выбранной группы нет расписания. </strong>
 		<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -26,7 +26,7 @@
 
 	<div class="tab-content">
 		{% for day, day_name in days_of_week.items %}
-			<div id="{{ day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
+			<div id="{{day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
 				<div class="row">
 
 					<div class="col-sm-8">
@@ -64,10 +64,10 @@
 								<div class="form-group">{% bootstrap_form_errors edit_form %}</div>
 								<input type="number" name="day_of_week" value="{{day}}" hidden>
 								<input type="text" name="group" value="{{group_form.group.value}}" hidden>
-								{% bootstrap_field edit_form.lesson_number set_required=False %}
+								{% bootstrap_field edit_form.lesson_number %}
+								{% bootstrap_field edit_form.room set_required=False %}
 								{% bootstrap_field edit_form.lesson_title set_required=False %}
 								{% bootstrap_field edit_form.teacher set_required=False %}
-								{% bootstrap_field edit_form.room set_required=False %}
 								<button type="submit" class="btn btn-primary">Сохранить</button>
 							</form>
 						{% endif %}

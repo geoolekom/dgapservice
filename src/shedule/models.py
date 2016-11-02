@@ -3,7 +3,35 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from groups.models import FacultyGroup as Group
+from library.models import Subject
+
 from dgapservice.settings import STATIC_ROOT
+import datetime
+
+
+class Teacher(models.Model):
+	pass
+
+
+class Auditory(models.Model):
+	pass
+
+
+class Lesson(models.Model):
+	group = models.ForeignKey(Group, verbose_name='Группа')
+	room = models.ForeignKey(Auditory, verbose_name='Аудитория')
+	teacher = models.ForeignKey(Teacher, verbose_name='Преподаватель')
+	subject = models.ForeignKey(Subject, verbose_name='Предмет')
+
+	def __str__(self):
+		return str(self.group) + ": " + str(self.subject) + " в " + str(self.weekday)
+
+	weekday = models.IntegerField(default=1, verbose_name='День недели', validators=[
+		MaxValueValidator(7),
+		MinValueValidator(1)
+	])
+
+
 
 
 class Shedule(models.Model):
@@ -24,82 +52,6 @@ class Shedule(models.Model):
 		return str(self.group) + ": day " + str(self.day_of_week) + ", lesson " + str(self.lesson_number) + '.\t' + str(self.lesson_title)
 
 	@staticmethod
-	def refill():
-		import os
-		import xlrd
-		os.chdir(STATIC_ROOT + 'shedule/xls')
-		files = os.listdir()
-		for file_name in files:
-			book = xlrd.open_workbook(file_name,formatting_info=True)
-			sheet = book.sheet_by_index(0)
-
-			day_of_week = 1
-			lesson_number = 0
-
-			for row_number in range(sheet.nrows):
-
-				row = sheet.row_values(row_number)
-				if row_number == 4:
-					groups = dict()
-					for i in range(len(row)):
-						if row[i].isnumeric():
-							groups[i] = int(row[i])
-				elif row_number > 4:
-					print(row[0], row[1], '\tand\t', day_of_week, lesson_number)
-					if row[1] != '':
-						lesson_number += 1
-					if lesson_number == 8:
-						lesson_number = 1
-						day_of_week += 1
-
-					for i in range(2, len(row)):
-						try:
-							group_number = groups[i]
-							group, created = Group.objects.get_or_create(group_number=group_number, year=2016)
-
-							if row[i] == '' and row[1] != '':
-								lesson_title = ''
-								teacher = ''
-								room = ''
-								shedule = Shedule(group=group,
-									day_of_week=day_of_week,
-									lesson_number=lesson_number,
-									lesson_title=lesson_title,
-									teacher=teacher,
-									room=room)
-								shedule.save()
-							else:
-								if len(row[i].split('/')) >= 3:
-									lesson_title, teacher, room = row[i].split('/')
-								elif len(row[i].split(' ')) >= 3 and row[i].split(' ')[-2].isnumeric():
-									lesson_title = ' '.join(row[i].split(' ')[:-2])
-									room = ' '.join(row[i].split(' ')[-2:])
-									teacher = ''
-								else:
-									lesson_title = row[i]
-									teacher = ''
-									room = ''
-
-								try:
-									Shedule.objects.filter(group=group, day_of_week=day_of_week, lesson_number=lesson_number).delete()
-									Shedule.objects.create(group=group,
-										day_of_week=day_of_week,
-										lesson_number=lesson_number,
-										lesson_title=lesson_title,
-										teacher=teacher,
-										room=room)
-								except:
-									shedule = Shedule(group=group, 
-										day_of_week=day_of_week,
-										lesson_number=lesson_number,
-										lesson_title=lesson_title,
-										teacher=teacher,
-										room=room)
-									shedule.save()
-						except:
-							pass
-
-	@staticmethod
 	def json_refill():
 		import requests
 
@@ -115,9 +67,12 @@ class Shedule(models.Model):
 		faculties = get_as_list("https://mipt.ru/api/schedule/get_faculties", 'faculties')
 		for faculty in faculties:
 			if faculty['faculty_name'] == 'ФОПФ':
+				print(faculty['faculty_name'])
 				groups = get_as_list("https://mipt.ru/api/schedule/get_groups?faculty_id=" + str(faculty['faculty_id']), 'groups')
 				for group in groups:
-					group_instance, created = Group.objects.get_or_create(group_number=group['group_name'], year=2016)
+					year = 0
+					#year = int(datetime.datetime.today().timetuple()[0])//10 - int(group['group_name'])//10%10
+					group_instance, created = Group.objects.get_or_create(group_number=group['group_name'], year=year)
 					days = get_as_list("https://mipt.ru/api/schedule/get_schedule?group_id=" + str(group['group_id']), 'days')
 					for day in days:
 						for i in range(1, len(day['lessons']) + 1):

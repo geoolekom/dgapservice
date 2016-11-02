@@ -1,2 +1,44 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
 {% load bootstrap3 %}
+
+{% block title %} Библиотека {% endblock %}
+
+{% block content %}
+
+<form method="get" class="form-inline">
+	{% bootstrap_form_errors group_form %}
+	{% bootstrap_form group_form %}
+	<input class="btn btn-default btn-active" type="submit" value="Показать книги!">
+</form>
+
+{% if not object_list %}
+	<div class="alert alert-danger fade in">
+		<strong> У выбранной группы нет предметов. </strong>
+		<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	</div>
+{% else %}
+
+    <div class="row">
+            <ul class="col-sm-3 nav nav-pills nav-stacked">
+                {% for subject in object_list %}
+                    <li class="{% if forloop.counter == 1 %}active{% endif %}"> <a data-toggle="pill" href="#{{subject.id}}"> {{ subject }} </a> </li>
+                {% endfor %}
+            </ul>
+            <div class="col-sm-9 tab-content">
+                {% for subject in object_list %}
+                    <div id="{{subject.id}}" class="tab-pane fade{% if forloop.counter == 1 %}in active{% endif %}">
+                        {% for book in subject.books.all %}
+                        <p> <a href="{{ book.book_file.url }}">{{book}}</a> </p>
+                        {% empty %}
+                        <div class="alert alert-danger">
+                            <strong> Нет учебников по {{subject}} </strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+
+{% endif %}
+
+{% endblock %}
