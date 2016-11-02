@@ -6,4 +6,4 @@ class FacultyGroup(models.Model):
 	year = models.IntegerField()
 	
 	def __str__(self):
-		return self.group_number
+		return str(self.group_number)

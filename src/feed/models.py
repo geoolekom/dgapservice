@@ -15,7 +15,7 @@ class Post(models.Model):
 	upd_time = models.DateTimeField('Последнее изменение', auto_now=True)
 
 	def __str__(self):
-		return self.title
+		return str(self.title)
 
 	def summary(self):
 		strEntry = str(self.entry)
@@ -53,4 +53,4 @@ class Comment(models.Model):
 	upd_time = models.DateTimeField('Последнее изменение', auto_now=True)
 
 	def __str__(self):
-		return self.post + ":\t" + self.entry
+		return str(self.post) + ":\t" + str(self.entry)

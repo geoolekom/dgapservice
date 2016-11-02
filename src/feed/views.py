@@ -113,8 +113,6 @@ class EditPost(UpdateView):
 	def form_valid(self, form):
 		if form.is_valid:
 			post = form.save(commit=False)
-			post.author = self.request.user
-			post.rating = 0
 			post.save()
 			return redirect('/feed/' + str(self.object.id))
 		else:

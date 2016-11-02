@@ -6,29 +6,27 @@ from groups.models import FacultyGroup as Group
 from dgapservice.settings import STATIC_ROOT
 
 
-import os
-import xlrd
-
-
 class Shedule(models.Model):
-	group = models.ForeignKey(Group)
-	day_of_week = models.IntegerField(default=1, validators=[
+	group = models.ForeignKey(Group, verbose_name='Группа')
+	day_of_week = models.IntegerField(default=1, verbose_name='День недели', validators=[
 		MaxValueValidator(7),
 		MinValueValidator(1)
 	])
-	lesson_number = models.IntegerField(default=1, validators=[
+	lesson_number = models.IntegerField(default=1, verbose_name='Пара', validators=[
 		MaxValueValidator(7),
 		MinValueValidator(1)
 	])
-	lesson_title = models.CharField(max_length=50)
-	teacher = models.CharField(max_length=50)
-	room = models.CharField(max_length=10)
+	lesson_title = models.CharField(verbose_name='Предмет', max_length=50, null=True, blank=True)
+	teacher = models.CharField(verbose_name='Преподаватель', max_length=50, null=True, blank=True)
+	room = models.CharField(verbose_name='Аудитория', max_length=10, null=True, blank=True)
 
 	def __str__(self):
 		return str(self.group) + ": day " + str(self.day_of_week) + ", lesson " + str(self.lesson_number) + '.\t' + str(self.lesson_title)
 
 	@staticmethod
 	def refill():
+		import os
+		import xlrd
 		os.chdir(STATIC_ROOT + 'shedule/xls')
 		files = os.listdir()
 		for file_name in files:
@@ -103,7 +101,6 @@ class Shedule(models.Model):
 
 	@staticmethod
 	def json_refill():
-		import json
 		import requests
 
 		def get_as_list(url, name):

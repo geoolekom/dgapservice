@@ -6,8 +6,8 @@
 {% block content %} 
 
 <form method="get" class="form-inline">
-	{% bootstrap_form_errors shedule_form %}
-	{% bootstrap_form shedule_form %}
+	{% bootstrap_form_errors group_form %}
+	{% bootstrap_form group_form %}
 	<input class="btn btn-default btn-active" type="submit" value="Показать расписание!">
 </form>
 
@@ -57,7 +57,22 @@
 
 						</table>
 					</div>
-					<div class="col-sm-5"></div>
+					<div class="col-sm-1"></div>
+					<div class="col-sm-4">
+						{% if user.is_staff and edit_form %}
+							<form class="form" method="post" action="edit-lesson">
+								{% csrf_token %}
+								<div class="form-group">{% bootstrap_form_errors edit_form %}</div>
+								<input type="number" name="day_of_week" value="{{day}}" hidden>
+								<input type="text" name="group" value="{{group_form.group.value}}" hidden>
+								{% bootstrap_field edit_form.lesson_number set_required=False %}
+								{% bootstrap_field edit_form.lesson_title set_required=False %}
+								{% bootstrap_field edit_form.teacher set_required=False %}
+								{% bootstrap_field edit_form.room set_required=False %}
+								<button type="submit" class="btn btn-primary">Сохранить</button>
+							</form>
+						{% endif %}
+					</div>
 
 				</div>
 			</div>

@@ -14,4 +14,4 @@ class User(AbstractUser):
 	room = models.IntegerField(blank=True, null=True)
 
 	def __str__(self):
-		return self.username
+		return str(self.username)

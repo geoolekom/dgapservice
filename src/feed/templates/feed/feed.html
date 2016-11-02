@@ -5,7 +5,7 @@
 
 {% block content %}
 
-	{% if object_list.count != 0 %}
+	{% if object_list %}
 
 		<div class="row blocked header">
 			<div class="col-sm-8">
@@ -27,7 +27,7 @@
 			<div class="col-sm-3">
 				<form class="form-horizontal">
 					<div class="form-group">
-						<input type="text" class="form-control" name="searchstr" placeholder="Поиск" val="" id="srch">
+						<input type="text" class="form-control" name="searchstr" placeholder="Поиск" value="" id="srch">
 					</div>
 				</form>
 			</div>
@@ -39,40 +39,9 @@
 					{% for post in object_list %}
 					<div class="panel panel-default">
 						<div class="panel-heading blocked post-title">
-							<div class="row">
-								<div class="col-sm-1" align="center">
-									{% if user.is_staff and post.author == user %}
-									<p> </p>
-										<form method="post" class="form-inline">
-											{% csrf_token %}
-											<input type="text" name="mypost" value="{{post.id}}" hidden>
-											<div class="dropdown">
-												<button class="btn btn-link btn-lg dropdown-toggle" type="button" data-toggle="dropdown">
-													<span class="glyphicon glyphicon-chevron-down"></span>
-												</button>
-												<ul class="dropdown-menu">
-													<li>
-														<button formaction="delete" class="btn btn-link">
-															<span class="glyphicon glyphicon-remove">  Удалить</span>
-														</button>
-													</li>
-													<li>
-														<button formaction="edit-post" class="btn btn-link">
-															<span class="glyphicon glyphicon-pencil">  Редактировать</span>
-														</button>
-													</li>
-												</ul>
-											</div>
-										</form>
-									{% endif %}
-								</div>
-								<div class="col-sm-9">
-									<a href="{% url 'feed:detail' post.id %}"> <h2> {{ post.title }} </h2></a>
-								</div>
-								<div class="col-sm-1 post-rating" align="right"> <b> {{ post.rating }} </b> </div>
-								<div class="col-sm-1" align="right">  {% include 'feed/rate_form.html' %}  </div>
-							</div>
+							{% include 'feed/post_header.html' %}
 						</div>
+
 						<div class="panel-body">
 							<p> {{ post.summary | safe }} </p>
 						</div>
@@ -89,7 +58,7 @@
 			</div>
 			<div class="col-sm-3">
 				<form class="form form-inline">
-					<input type="text" class="form-control" placeholder="Поиск"  name="searchstr" val="">
+					<input type="text" class="form-control" placeholder="Поиск" name="searchstr" value="">
 				</form>
 			</div>
 		</div>
