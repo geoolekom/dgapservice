@@ -27,4 +27,5 @@ urlpatterns = [
     url(r'^register/', RegisterView.as_view(), name="register"),
     url(r'^shedule/', include('shedule.urls', namespace='shedule')),
     url(r'^services/', include('services.urls', namespace='services')),
+    url(r'^library/', include('library.urls', namespace='library')),
 ]

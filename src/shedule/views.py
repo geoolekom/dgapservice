@@ -1,7 +1,8 @@
 from groups.models import FacultyGroup as Group
 from shedule.models import Shedule
 import datetime
-from shedule.forms import GroupChoiceForm, EditSheduleForm
+from shedule.forms import EditSheduleForm
+from groups.forms import get_group_form
 
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404, redirect, reverse
@@ -13,15 +14,8 @@ class SheduleListView(ListView):
 
 	def dispatch(self, request, *args, **kwargs):
 		self.edit_form = None
-		if 'group' in request.GET:
-			group = request.GET['group']
-			self.group_form = GroupChoiceForm(self.request.GET)
-		else:
-			try:
-				group = str(self.request.user.group)
-				self.group_form = GroupChoiceForm({'group': group})
-			except:
-				self.group_form = GroupChoiceForm()
+
+		group, self.group_form = get_group_form(request)
 
 		if request.user.is_staff:
 			if request.POST:
