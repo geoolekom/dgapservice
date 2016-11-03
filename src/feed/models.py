@@ -19,8 +19,8 @@ class Post(models.Model):
 
 	def summary(self):
 		strEntry = str(self.entry)
-		if len(strEntry) > 350:
-			return strEntry[:350] + '...'
+		if len(strEntry) > 400:
+			return strEntry[:400] + '...'
 		else:
 			return strEntry
 

@@ -1,11 +1,34 @@
 from groups.models import FacultyGroup as Group
-from shedule.models import Shedule
+from shedule.models import Shedule, Lesson, rings, weekdays
 import datetime
 from shedule.forms import EditSheduleForm
 from groups.forms import get_group_form
 
 from django.views.generic.list import ListView
 from django.shortcuts import get_object_or_404, redirect, reverse
+
+
+class LessonListView(ListView):
+	template_name = 'shedule/shedule.html'
+	today = datetime.date.today().weekday() + 1
+
+	def dispatch(self, request, *args, **kwargs):
+		group, self.group_form = get_group_form(request)
+		return super(LessonListView, self).dispatch(request, args, kwargs)
+
+	def get_queryset(self):
+		if self.group_form.is_valid():
+			group = Group.objects.get(group_number=self.group_form.cleaned_data['group'])
+			return Lesson.objects.filter(group=group)
+		else:
+			return Lesson.objects.none()
+
+	def get_context_data(self, **kwargs):
+		context = super(LessonListView, self).get_context_data(**kwargs)
+		context['group_form'] = self.group_form
+		context['days_of_week'] = weekdays
+		context['today'] = self.today
+		return context
 
 
 class SheduleListView(ListView):
