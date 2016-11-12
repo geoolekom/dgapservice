@@ -19,13 +19,13 @@
 	
 {% else %}
 	<ul class="nav nav-tabs">
-		{% for day, day_name in days_of_week.items %}
+		{% for day, day_name in weekdays.items %}
 			<li class="{% if day == today %} active {% endif %}"> <a data-toggle="tab" href="#{{ day }}"> {{ day_name }} </a> </li>
 		{% endfor %}
 	</ul>
 
 	<div class="tab-content">
-		{% for day, day_name in days_of_week.items %}
+		{% for day, day_name in weekdays.items %}
 			<div id="{{day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
 				<div class="row">
 
@@ -47,8 +47,8 @@
 										<tr class="success">
 											<td align="center"> {{ lesson.time_interval }} </td>
 											<td align="center"> {{ lesson.room }} </td>
-											<td> {{ lesson.subject }} </td>
-											<td> <a href="{{ lesson.teacher.get_link }}">{{ lesson.teacher }}</a> </td>
+											<td> <a href="{{ lesson.subject.get_link }}"> {{ lesson.subject }} </td>
+											<td> <a href="{{ lesson.teacher.get_link }}"> {{ lesson.teacher }}</a> </td>
 										</tr>
 									{% endif %}
 								{% endfor %}
@@ -62,11 +62,11 @@
 							<form class="form" method="post" action="edit-lesson">
 								{% csrf_token %}
 								<div class="form-group">{% bootstrap_form_errors edit_form %}</div>
-								<input type="number" name="day_of_week" value="{{day}}" hidden>
+								<input type="number" name="weekday" value="{{day}}" hidden>
 								<input type="text" name="group" value="{{group_form.group.value}}" hidden>
-								{% bootstrap_field edit_form.lesson_number %}
+								{% bootstrap_field edit_form.time_interval %}
 								{% bootstrap_field edit_form.room set_required=False %}
-								{% bootstrap_field edit_form.lesson_title set_required=False %}
+								{% bootstrap_field edit_form.subject set_required=False %}
 								{% bootstrap_field edit_form.teacher set_required=False %}
 								<button type="submit" class="btn btn-primary">Сохранить</button>
 							</form>

@@ -21,12 +21,14 @@
     <div class="row">
             <ul class="col-sm-3 nav nav-pills nav-stacked">
                 {% for subject in object_list %}
-                    <li class="{% if forloop.counter == 1 %}active{% endif %}"> <a data-toggle="pill" href="#{{subject.id}}"> {{ subject }} </a> </li>
+                    <li class="{% if subject == active_subject or forloop.counter == 1 and not active_subject %}active{% endif %}">
+                        <a data-toggle="pill" href="#{{subject.id}}"> {{ subject }} </a>
+                    </li>
                 {% endfor %}
             </ul>
             <div class="col-sm-9 tab-content">
                 {% for subject in object_list %}
-                    <div id="{{subject.id}}" class="tab-pane fade{% if forloop.counter == 1 %}in active{% endif %}">
+                    <div id="{{subject.id}}" class="tab-pane fade in {% if subject == active_subject or forloop.counter == 1 and not active_subject %}active{% endif %}">
                         {% for book in subject.books.all %}
                         <p> <a href="{{ book.book_file.url }}">{{book}}</a> </p>
                         {% empty %}

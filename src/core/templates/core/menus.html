@@ -12,5 +12,5 @@
 <li class='{% if request.path == laundry %}active{%endif%}'><a href='{{ laundry }}'>Прачечная</a></li>
 <li class='{% if request.path == food %}active{%endif%}'><a href='{{ food }}'>Еда</a></li>
 {% if user.is_staff %}
-    <li class='{% if request.path == food %}active{%endif%}'><a href='/admin'>Админка</a></li>
+    <li><a href='/admin'>Админка</a></li>
 {% endif %}

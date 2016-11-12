@@ -1,10 +1,10 @@
 from django import forms
-from shedule.models import Shedule
+from shedule.models import Lesson
 
 
-class EditSheduleForm(forms.ModelForm):
+class EditLessonForm(forms.ModelForm):
 
 	class Meta:
-		model = Shedule
-		fields = ('group', 'day_of_week', 'lesson_number', 'lesson_title', 'teacher', 'room', )
+		model = Lesson
+		fields = ('group', 'weekday', 'time_interval', 'subject', 'room', 'teacher', )
 

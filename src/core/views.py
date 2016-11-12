@@ -1,19 +1,14 @@
 from django.contrib import auth
 from django.views.generic.edit import FormView, CreateView
-from django.views.generic import RedirectView
 from core.forms import RegistrationForm, LoginForm
 from core.models import User
 from django.shortcuts import redirect, render
-from django.core.urlresolvers import resolve
+from django.shortcuts import reverse
 
 
 def logout(request):
 	auth.logout(request)
-	if 'HTTP_REFERER' in request.META:
-		return redirect(request.META['HTTP_REFERER'])
-	else:
-		return render(request, 'core/base.html',
-		        {'errors': 'Не надо пытаться разлогиниться через строку браузера!\t'})
+	return redirect(reverse('feed:feed'))
 
 
 def login(request):
