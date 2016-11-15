@@ -19,16 +19,16 @@ class LessonListView(ListView):
 
 		if request.user.is_staff:
 			if request.POST:
-				self.edit_form = EditLessonForm({'group': group}, request.POST)
+				self.edit_form = EditLessonForm({'group': group, 'time_interval': 0}, request.POST)
 			else:
-				self.edit_form = EditLessonForm({'group': group})
+				self.edit_form = EditLessonForm({'group': group, 'time_interval': 0})
 
 		return super(LessonListView, self).dispatch(request, args, kwargs)
 
 	def get_queryset(self):
 		if self.group_form.is_valid():
 			group = Group.objects.get(group_number=self.group_form.cleaned_data['group'])
-			return Lesson.objects.filter(group=group)
+			return Lesson.objects.filter(group=group).order_by('time_interval')
 		else:
 			return Lesson.objects.none()
 
@@ -36,6 +36,7 @@ class LessonListView(ListView):
 		context = super(LessonListView, self).get_context_data(**kwargs)
 		context['group_form'] = self.group_form
 		context['weekdays'] = weekdays
+		context['rings'] = rings
 		context['today'] = self.today
 		context['edit_form'] = self.edit_form
 		return context

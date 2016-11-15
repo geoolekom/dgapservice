@@ -11,10 +11,7 @@ class Book(models.Model):
 	book_file = models.FileField(verbose_name='Файл книги', upload_to=book_path)
 
 	def __str__(self):
-		if self is None:
-			return ''
-		else:
-			return str(self.title)
+		return str(self.title)
 
 
 class BookAuthor(models.Model):
@@ -22,10 +19,7 @@ class BookAuthor(models.Model):
 	books = models.ManyToManyField(Book, blank=True, verbose_name='Книги автора')
 
 	def __str__(self):
-		if self is None:
-			return ''
-		else:
-			return str(self.name)
+		return str(self.name)
 
 
 class Subject(models.Model):
@@ -33,10 +27,7 @@ class Subject(models.Model):
 	books = models.ManyToManyField(Book, blank=True, verbose_name='Книги по теме')
 
 	def __str__(self):
-		if self is None:
-			return ''
-		else:
-			return str(self.name)
+		return str(self.name)
 
 	def get_link(self):
 		return reverse('library:library', kwargs={'acts': self.pk})

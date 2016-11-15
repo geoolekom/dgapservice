@@ -34,9 +34,9 @@
 
 							<thead>
 								<tr class="info">
-									<th width="10%">Время</th>
+									<th width="20%" align="center">Время</th>
 									<th width="10%">Аудитория</th>
-									<th width="55%">Предмет</th>
+									<th width="45%">Предмет</th>
 									<th width="25%">Преподаватель</th>
 								</tr>
 							</thead>
@@ -45,10 +45,10 @@
 								{% for lesson in object_list %}
 									{% if lesson.weekday == day %}
 										<tr class="success">
-											<td align="center"> {{ lesson.time_interval }} </td>
-											<td align="center"> {{ lesson.room }} </td>
-											<td> <a href="{{ lesson.subject.get_link }}"> {{ lesson.subject }} </td>
-											<td> <a href="{{ lesson.teacher.get_link }}"> {{ lesson.teacher }}</a> </td>
+											<td align="center"> {{ rings | get_value_from_dict:lesson.time_interval }}</td>
+											<td align="center"> {{ lesson.room | default_if_none:'' }} </td>
+											<td> <a href="{{ lesson.subject.get_link }}"> {{ lesson.subject | default_if_none:'' }} </td>
+											<td> <a href="{{ lesson.teacher.get_link }}"> {{ lesson.teacher | default_if_none:'' }}</a> </td>
 										</tr>
 									{% endif %}
 								{% endfor %}

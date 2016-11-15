@@ -3,6 +3,11 @@ from django.views.generic import ListView
 from groups.forms import get_group_form
 from library.models import Subject
 from groups.models import FacultyGroup as Group
+from django.template.defaulttags import register
+
+@register.filter
+def get_value_from_dict(dictionary, key):
+	return dictionary.get(key)
 
 
 class BookListView(ListView):

@@ -23,10 +23,7 @@ class Teacher(models.Model):
 	name = models.CharField(max_length=50)
 
 	def __str__(self):
-		if self is None:
-			return ''
-		else:
-			return str(self.name)
+		return str(self.name)
 
 	def get_link(self):
 		return 'http://wikimipt.org/wiki/' + '_'.join(str(self.name).split(' '))
@@ -47,10 +44,7 @@ class Auditory(models.Model):
 	name = models.CharField(max_length=25)
 
 	def __str__(self):
-		if self is None:
-			return ''
-		else:
-			return str(self.name)
+		return str(self.name)
 
 
 class Lesson(models.Model):
@@ -63,7 +57,7 @@ class Lesson(models.Model):
 		return str(self.group) + ": " + str(self.subject) + " в " + str(self.weekday)
 
 	weekday = models.IntegerField(default=datetime.datetime.today().weekday(), verbose_name='День недели', choices=weekdays.items())
-	time_interval = models.IntegerField(choices=rings.items(), blank=False, default=0)
+	time_interval = models.IntegerField(choices=rings.items(), blank=False, default=0, verbose_name='Время проведения')
 
 	@staticmethod
 	def json_refill():
