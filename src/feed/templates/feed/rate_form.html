@@ -1,14 +1,20 @@
-<form action="rate/{{ post.id }}" method="post">
+<form action="{% url 'feed:rate' %}" method="post">
     {% csrf_token %}
-    {% if user in post.likedBy %}
-    <button type="button" class="btn btn-block btn-success" name="mark" value="1"> <b> + </b> </button>
-    <button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b> - </b> </button>
-    {% elif user in post.dislikedBy %}
-    <button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
-    <button type="button" class="btn btn-block btn-danger" name="mark" value="-1"> <b>-</b> </button>
-    {% elif not user.is_authenticated %}
-    {% else %}
-    <button type="submit" class="btn btn-block btn-default" name="mark" value="1"> <b>+</b> </button>
-    <button type="submit" class="btn btn-block btn-default" name="mark" value="-1"> <b>-</b> </button>
+    {% if user.is_authenticated %}
+        <input type="hidden" name="pk" value="{{ post.id }}">
+        <button
+                type="submit"
+                class="btn btn-block {% if user in post.liked_by %}btn-success{% else %}btn-default{% endif %}"
+                name="mark"
+                value="1">
+            <b> + </b>
+        </button>
+        <button
+                type="submit"
+                class="btn btn-block {% if user in post.disliked_by %}btn-danger{% else %}btn-default{% endif %}"
+                name="mark"
+                value="-1">
+            <b> - </b>
+        </button>
     {% endif %}
 </form>

@@ -1,12 +1,9 @@
 from feed.models import Post as myPost
-from feed.models import RatedPost, Comment
-from django.http import HttpResponseRedirect
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic import RedirectView
 from .forms import *
-from django.shortcuts import redirect, get_object_or_404, render
-from django import forms
-from django.utils.decorators import method_decorator
+from django.shortcuts import redirect, get_object_or_404, render, reverse
 
 
 class Feed(ListView):
@@ -51,7 +48,7 @@ class PostDetail(CreateView):
 			comment.author = self.request.user
 			comment.post = self.related_post
 			comment.save()
-		return redirect(self.request.META['HTTP_REFERER'])
+		return redirect(reverse("feed:detail", kwargs={"pk": self.related_post.pk}))
 
 
 class AddPost(CreateView):
@@ -69,7 +66,7 @@ class AddPost(CreateView):
 		post.author = self.request.user
 		post.rating = 0
 		post.save()
-		return redirect('/feed/' + str(post.id))
+		return redirect(reverse('feed:detail', kwargs={"pk": post.pk}))
 
 
 class Delete(DeleteView):
@@ -136,28 +133,67 @@ class EditComment(PostDetail):
 	def form_valid(self, form):
 		setattr(self.related_comment, 'entry', form.cleaned_data['entry'])
 		self.related_comment.save()
-		return redirect('/feed/' + str(self.related_comment.post.id))
+		return redirect(reverse('feed:post', kwargs={"pk": self.related_comment.post.id}))
 
 
-def rate(request, pk):
-	post = get_object_or_404(myPost, pk=pk)
+class DeleteComment(DeleteView):
+	template_name = 'feed/post.html'
+	model = Comment
+
+	def delete(self, request, *args, **kwargs):
+		obj = self.get_object(queryset=None)
+		if obj.author == self.request.user:
+			super(DeleteComment, self).delete(request, *args, **kwargs)
+			self.success_url = reverse('feed:detail', kwargs={"pk": object.post.pk})
+		else:
+			self.success_url = reverse('core:error', kwargs={'errors': 'Это не ваш комментарий!\t'})
+
+
+class Rate(RedirectView, UpdateView):
+
+	form_class = RateForm
+	template_name = 'feed/rate_form.html'
+
+	def form_valid(self, form):
+		post = Post.objects.get(pk=form.cleaned_data["pk"])
+		user = self.request.user
+
+		RatedPost.objects.update_or_create(
+			user=user,
+			post=post,
+			defaults={'mark': form.cleaned_data['mark']}
+		)
+
+		post.update_rating()
+
+		if 'HTTP_REFERER' in self.request.META:
+			return redirect(self.request.META['HTTP_REFERER'])
+		else:
+			return redirect(reverse('feed:detail', kwargs={'pk': post.id}))
+
+
+def rate(request):
+	if 'pk' in request.POST:
+		post = get_object_or_404(myPost, pk=request.POST['pk'])
+	else:
+		return redirect(reverse('feed:feed'))
 
 	if 'mark' in request.POST and abs(int(request.POST['mark'])) == 1:
 		mark = int(request.POST['mark'])
 	else:
-		return render(request, 'core/base.html',
-		        {'errors': 'Не надо пытаться химичить с оценками!\t'})
+		return redirect(reverse('core:error', kwargs={'errors': 'Не надо пытаться химичить с оценками!\t'}))
 
 	user = request.user
-	
-	try:
-		rated = RatedPost.objects.all().get(user=user, post=post)
-		post.changeRating(-rated.mark)
-	except:
-		rated = RatedPost(user=user, post=post)
 
-	post.changeRating(mark)
-	rated.mark = mark
-	rated.save()
+	RatedPost.objects.update_or_create(
+		user=user,
+		post=post,
+		defaults={'mark': mark}
+	)
 
-	return redirect(request.META['HTTP_REFERER'])
+	post.update_rating()
+
+	if 'HTTP_REFERER' in request.META:
+		return redirect(request.META['HTTP_REFERER'])
+	else:
+		return redirect(reverse('feed:detail', kwargs={'pk': post.id}))

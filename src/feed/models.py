@@ -18,23 +18,29 @@ class Post(models.Model):
 		return str(self.title)
 
 	def summary(self):
-		strEntry = str(self.entry)
-		if len(strEntry) > 400:
-			return strEntry[:400] + '...'
+		str_entry = str(self.entry)
+		if len(str_entry) > 400:
+			return str_entry[:400] + '...'
 		else:
-			return strEntry
+			return str_entry
 
 	def in_details(self):
 		return str(self.entry) + '\n(' + str(self.author) + ')'
 
-	def changeRating(self, mark):
+	def change_rating(self, mark):
 		self.rating += mark
 		self.save()
 
-	def likedBy(self):
+	def update_rating(self):
+		self.rating = 0
+		for rated in RatedPost.objects.filter(post=self):
+			self.rating += rated.mark
+		self.save()
+
+	def liked_by(self):
 		return [a.user for a in RatedPost.objects.filter(post=self, mark=1)]
 
-	def dislikedBy(self):
+	def disliked_by(self):
 		return [a.user for a in RatedPost.objects.filter(post=self, mark=-1)]
 
 
