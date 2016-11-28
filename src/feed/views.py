@@ -1,9 +1,11 @@
 from feed.models import Post as myPost
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, View
 from .forms import *
 from django.shortcuts import redirect, get_object_or_404, render, reverse
+from django.http import HttpResponse, JsonResponse
+import json
 
 
 class Feed(ListView):
@@ -197,3 +199,36 @@ def rate(request):
 		return redirect(request.META['HTTP_REFERER'])
 	else:
 		return redirect(reverse('feed:detail', kwargs={'pk': post.id}))
+
+
+class ListRateView(View):
+
+	def get(self, request):
+		ids = request.GET.get('ids', '')
+		ids = ids.split(',')
+		posts = dict(Post.objects.filter(id__in=ids).values_list('id', 'rating'))
+		return JsonResponse(posts)
+
+
+class PostRateView(View):
+
+	def dispatch(self, request, pk=None, *args, **kwargs):
+		self.feedpost = get_object_or_404(myPost, pk=pk)
+		return super(PostRateView, self).dispatch(request, *args, **kwargs)
+
+	def get(self, request):
+		return HttpResponse(self.feedpost.rating)
+
+	def post(self, request):
+		user = request.user
+		mark = int(request.POST['mark'])
+		if abs(mark) == 1 and user.is_authenticated:
+			RatedPost.objects.update_or_create(
+				user=user,
+				post=self.feedpost,
+				defaults={'mark': mark}
+			)
+			self.feedpost.update_rating()
+		return HttpResponse(self.feedpost.rating)
+
+

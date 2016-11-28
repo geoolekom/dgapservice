@@ -25,6 +25,10 @@
 	font-family: "Trebuchet MS", monospace;
 }
 
+.btn {
+    outline: none !important;
+}
+
 .avatar {
     padding: 2px;
     height: 49px;
@@ -37,6 +41,8 @@
 	line-height: 80%;
 	font-family: "Trebuchet MS", monospace;
 }
+
+.login-form {}
 
 .blocked {
     display: block;

@@ -1,9 +1,10 @@
 from django.contrib import auth
 from django.views.generic.edit import FormView, CreateView
-from core.forms import RegistrationForm, LoginForm
+from core.forms import RegistrationForm, LogoutForm
 from core.models import User
 from django.shortcuts import redirect, render
 from django.shortcuts import reverse
+from django.contrib.auth.forms import AuthenticationForm
 
 
 def logout(request):

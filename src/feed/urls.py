@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 # app_name = 'feed'
 urlpatterns = [
 	url(r'^(?P<pk>\d+)', PostDetail.as_view(), name="detail"),
-	url(r'^rate', rate, name="rate"),
+	url(r'^rate/(?P<pk>\d+)', PostRateView.as_view(), name="rate"),
+	url(r'^ratings', ListRateView.as_view(), name="ratings"),
 	url(r'^$', Feed.as_view(), name="feed"),
 	url(r'delete', Delete.as_view(), name="delete"),
 	url(r'edit-comment', EditComment.as_view(), name="edit"),

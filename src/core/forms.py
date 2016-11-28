@@ -3,6 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.forms import AuthenticationForm
+from django.forms import Form
 
 
 class AdminUserAddForm(UserCreationForm):
@@ -40,4 +41,8 @@ class RegistrationForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+	pass
+
+
+class LogoutForm(Form):
 	pass

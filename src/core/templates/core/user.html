@@ -45,7 +45,7 @@
                 {% endif %}
             </li>
             <li class="list-group-item">
-                <a class="list-group-item-text" href="/logout/"  align="right">Выйти</a>
+                <a class="list-group-item-text" href="{% url 'core:logout' %}"  align="right">Выйти</a>
             </li>
         </ul>
 
@@ -54,12 +54,18 @@
 {% else %}
 
   <li>
-    <form class="navbar-form pull-right form-inline" method="post"> {% csrf_token %}
-        <input class="form-control" type="text" name="username" id="username" placeholder="Логин" size="14">
-        <input class="form-control" type="password" name="password1" id="password1" placeholder="Пароль" size="14">
 
-        <button type="submit" formaction="/login/" class="btn btn-link" name="sign"><span class="glyphicon glyphicon-log-in"></button>
-        <button type="submit" formaction="/register/" class="btn btn-link" name="register"><span class="glyphicon glyphicon-user"></button>
+    <form class="navbar-form pull-right form-inline" method="post">
+        {% csrf_token %}
+        {% bootstrap_field form.username show_label=False %}
+        {% bootstrap_field form.password show_label=False %}
+
+        <button type="submit" formaction="{% url 'core:login' %}" class="btn btn-link" name="sign">
+            <span class="glyphicon glyphicon-log-in"/>
+        </button>
+        <button type="submit" formaction="{% url 'core:register' %}" class="btn btn-link" name="register">
+            <span class="glyphicon glyphicon-user"/>
+        </button>
 
     </form>
   </li>

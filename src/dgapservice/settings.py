@@ -139,3 +139,5 @@ STATICFILES_DIRS = ('/home/geoolekom/track/web/dgapservice/src/static/',)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/home/geoolekom/track/web/dgapservice/media/'
 AUTH_USER_MODEL = 'core.User'
+LOGIN_REDIRECT_URL = '/feed/'
+

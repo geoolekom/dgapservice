@@ -1,19 +1,16 @@
 {% load static %}
-{% load bootstrap3 %}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="author" content="geoolekom">
 
+    <script src="{% static 'core/js/jquery-3.1.1.min.js' %}"></script>
+    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'core/js/main.js' %}"></script>
+
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/main.css' %}">
-
-    <script src="{% static 'core/js/jquery.min.js' %}"></script>
-    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
 
     <title> {% block title %} {% endblock %} </title>
     <style>
@@ -38,13 +35,11 @@
           </a>
         </div>
 
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav menus">
           {% include "core/menus.html" %}
         </ul>
 
-        <ul class="nav navbar-nav navbar-right">
-          {% include "core/user.html" %}
-        </ul>
+        <ul class="nav navbar-nav navbar-right login-form">Пользователь</ul>
       </div>
     </nav>
 

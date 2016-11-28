@@ -1,20 +1,18 @@
-<form action="{% url 'feed:rate' %}" method="post">
-    {% csrf_token %}
-    {% if user.is_authenticated %}
-        <input type="hidden" name="pk" value="{{ post.id }}">
-        <button
-                type="submit"
-                class="btn btn-block {% if user in post.liked_by %}btn-success{% else %}btn-default{% endif %}"
-                name="mark"
-                value="1">
-            <b> + </b>
-        </button>
-        <button
-                type="submit"
-                class="btn btn-block {% if user in post.disliked_by %}btn-danger{% else %}btn-default{% endif %}"
-                name="mark"
-                value="-1">
-            <b> - </b>
-        </button>
-    {% endif %}
-</form>
+{% if user.is_authenticated %}
+    <button
+            type="button"
+            class="plus-button btn btn-block {% if user in post.liked_by %}btn-success{% else %}btn-default{% endif %}"
+            name="mark"
+            data-rate-url="{% url 'feed:rate' pk=post.id %}"
+            data-post-id="{{ post.id }}">
+        <b> + </b>
+    </button>
+    <button
+            type="button"
+            class="minus-button btn btn-block {% if user in post.disliked_by %}btn-danger{% else %}btn-default{% endif %}"
+            name="mark"
+            data-rate-url="{% url 'feed:rate' pk=post.id %}"
+            data-post-id="{{ post.id }}">
+        <b> - </b>
+    </button>
+{% endif %}
