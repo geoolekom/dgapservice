@@ -1,12 +1,15 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block title %} Newsfeed {% endblock %}
 
 {% block content %}
 
-	{% if object_list %}
+    <script src="{% static 'core/js/feed.js' %}"></script>
 
+	{% if object_list %}
+		{% csrf_token %}
 		<div class="row blocked header">
 			<div class="col-sm-8">
 				<form class="form-inline">
@@ -21,7 +24,7 @@
 			</div>
 			<div class="col-sm-1">
 				{% if user.is_staff %}
-					<a href="{% url 'feed:add_post' %}" class="btn btn-link"><span class="glyphicon glyphicon-plus"></a>
+					<a href="{% url 'feed:post-add' %}" class="btn btn-link"><span class="glyphicon glyphicon-plus"></a>
 				{% endif %}
 			</div>
 			<div class="col-sm-3">
@@ -37,7 +40,7 @@
 			<div class="col-sm-12">
 				<div class="panel-group">
 					{% for post in object_list %}
-					<div class="panel panel-default">
+					<div class="post panel panel-default" data-post-id="{{post.id}}">
 						<div class="panel-heading blocked post-title">
 							{% include 'feed/post_header.html' %}
 						</div>

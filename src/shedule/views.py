@@ -5,8 +5,9 @@ import datetime
 from shedule.forms import EditLessonForm
 from groups.forms import get_group_form
 
-from django.views.generic.list import ListView
+from django.views.generic import ListView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404, redirect, reverse
+from django.http import JsonResponse
 
 
 class LessonListView(ListView):
@@ -42,48 +43,24 @@ class LessonListView(ListView):
 		return context
 
 
-def edit_lesson(request):
+class LessonUpdateView(UpdateView):
+	model = Lesson
+	form_class = EditLessonForm
+	template_name = 'shedule/edit_lesson_form.html'
+	success_url = '/shedule'
 
-	if request.POST and request.user.is_staff:
 
-		group = get_object_or_404(Group, group_number=request.POST['group'])
-		weekday = request.POST['weekday'] or 1
-		time_interval = request.POST['time_interval'] or 0
+class LessonDetailView(DetailView):
+	model = Lesson
 
-		lesson, created = Lesson.objects.get_or_create(
-			group=group,
-			weekday=weekday,
-			time_interval=time_interval
-		)
-
-		info = {
-			'teacher': Teacher,
-			'room': Auditory,
-			'subject': Subject,
+	def get(self, request, *args, **kwargs):
+		lesson = self.get_object()
+		data = {
+			'time_interval': lesson.time_interval,
+			'room': lesson.room,
+			'subject': lesson.subject,
+			'teacher': lesson.teacher,
 		}
+		return JsonResponse(data)
 
-		count = 0
-		for name, clazz in info.items():
-			try:
-				pk = request.POST[name]
-				obj = get_object_or_404(clazz, pk=pk)
-				count += 1
-				setattr(lesson, name, obj)
-			except AttributeError:
-				pass
-			except ValueError:
-				pass
-
-		if lesson.subject is not None:
-			group.subjects.add(lesson.subject)
-			group.save()
-
-		if count > 0:
-			lesson.save()
-		else:
-			lesson.delete()
-
-	if 'HTTP_REFERER' in request.META:
-		return redirect(request.META['HTTP_REFERER'])
-	return redirect(reverse('shedule:shedule'))
 

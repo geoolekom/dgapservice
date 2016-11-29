@@ -7,32 +7,6 @@ from django.shortcuts import reverse
 from django.contrib.auth.forms import AuthenticationForm
 
 
-def logout(request):
-	auth.logout(request)
-	return redirect(reverse('feed:feed'))
-
-
-def login(request):
-	if 'HTTP_REFERER' in request.META:
-		redirect_url = request.META['HTTP_REFERER']
-		if 'username' in request.POST and 'password1' in request.POST:
-			username = request.POST['username']
-			password = request.POST['password1']
-			user = auth.authenticate(username=username, password=password)
-			if user is not None and user.is_active:
-				auth.login(request, user)
-				return redirect(redirect_url)
-			else:
-				return render(request, 'core/base.html',
-				              {'errors': 'Неправильное имя пользователя или пароль.\t'})
-		else:
-			return render(request, 'core/base.html',
-			       {'errors': 'Вы не ввели имя пользователя или пароль.\t'})
-	else:
-		return render(request, 'core/base.html',
-		       {'errors': 'Вы пришли непонятно откуда и не ввели имя пользователя и пароль.\t'})
-
-
 class RegisterView(CreateView):
 	template_name = "core/register.html"
 	model = User

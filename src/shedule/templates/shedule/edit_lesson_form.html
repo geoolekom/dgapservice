@@ -1,0 +1,13 @@
+{% load bootstrap3 %}
+
+<form class="form edit-lesson" method="post" action="{% url 'shedule:lesson-edit' pk=lesson.id %}">
+    {% csrf_token %}
+    <div class="form-group">{% bootstrap_form_errors form %}</div>
+    <input type="number" name="weekday" value="{{day}}" hidden>
+    <input type="text" name="group" value="{{group_form.group.value}}" hidden>
+    {% bootstrap_field form.time_interval %}
+    {% bootstrap_field form.room set_required=False %}
+    {% bootstrap_field form.subject set_required=False %}
+    {% bootstrap_field form.teacher set_required=False %}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>

@@ -1,12 +1,15 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block title %} {{post.title}} {% endblock %}
 
 {% block content %}
 
+    <script src="{% static 'core/js/feed.js' %}"></script>
+	<script src="{% static 'core/js/post.js' %}"></script>
 	<div class="row">
-		<div class="panel panel-default">
+		<div class="post panel panel-default" data-post-id="{{post.id}}">
 			<div class="panel-heading blocked post-title">
 				{% include 'feed/post_header.html' %}
 			</div>
@@ -18,41 +21,16 @@
 	<div class="row">
 		<div class="col-sm-1"></div>
 		<div class="col-sm-10">
-			<div class="panel-group">
+			<div class="comments panel-group">
 				{% for comment in comments %}
-				<div class="panel panel-default">
-					<div class="panel-heading blocked comment-title">
-						<div class="row">
-							<div class="col-sm-10">
-								<strong> <b> {{ comment.author }} </b> </strong>
-							</div>
-							<div class="col-sm-2" align="right">
-								{% if user.is_authenticated and comment.author == user %}
-									<form method="post" class="form-inline">
-										{% csrf_token %}
-										<input type="text" name="comment" value="{{comment.id}}" hidden>
-										<button formaction="edit-comment" class="btn btn-xs btn-link"><span class="glyphicon glyphicon-pencil"></span></button>
-										<button formaction="delete" class="btn btn-xs btn-link"><span class="glyphicon glyphicon-remove"></span></button>
-									</form>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-					<div class="panel-body">
-						{% if user.is_authenticated and editing == comment.id %}
-							{% include "feed/comment_form.html" %}
-						{% else %}
-							{{ comment.entry | safe }}
-						{% endif %}
-					</div>
-				</div>
+					{% include 'feed/comment.html' %}
 				{% endfor %}
 			</div>
 		</div>
 		<div class="col-sm-1"></div>
 	</div>
-	{% if user.is_authenticated and editing == 0 %}
-		{% include "feed/comment_form.html" %}
+	{% if user.is_authenticated %}
+		{% include 'feed/add_comment_form.html' %}
 	{% endif %}
 
 {% endblock %}

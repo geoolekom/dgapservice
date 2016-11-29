@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block title %} Расписание {% endblock %}
 
@@ -18,6 +19,7 @@
 	</div> 
 	
 {% else %}
+	<script src="{% static 'core/js/shedule.js' %}"></script>
 	<ul class="nav nav-tabs">
 		{% for day, day_name in weekdays.items %}
 			<li class="{% if day == today %} active {% endif %}"> <a data-toggle="tab" href="#{{ day }}"> {{ day_name }} </a> </li>
@@ -29,26 +31,52 @@
 			<div id="{{day}}" class="tab-pane fade {% if day == today %} in active {% endif %}">
 				<div class="row">
 
-					<div class="col-sm-8">
+					<div class="col-sm-9">
 						<table class="table table-bordered">
 
 							<thead>
 								<tr class="info">
 									<th width="20%" align="center">Время</th>
 									<th width="10%">Аудитория</th>
-									<th width="45%">Предмет</th>
+									<th width="40%">Предмет</th>
 									<th width="25%">Преподаватель</th>
+									{% if user.is_staff %} <th width="5%">----</th> {% endif %}
 								</tr>
 							</thead>
 
 							<tbody>
 								{% for lesson in object_list %}
 									{% if lesson.weekday == day %}
-										<tr class="success">
-											<td align="center"> {{ rings | get_value_from_dict:lesson.time_interval }}</td>
+										<tr class="lesson success" data-lesson-id="{{lesson.id}}">
+											<td align="center" onclick=""> {{ rings | get_value_from_dict:lesson.time_interval }}</td>
 											<td align="center"> {{ lesson.room | default_if_none:'' }} </td>
 											<td> <a href="{{ lesson.subject.get_link }}"> {{ lesson.subject | default_if_none:'' }} </td>
 											<td> <a href="{{ lesson.teacher.get_link }}"> {{ lesson.teacher | default_if_none:'' }}</a> </td>
+											{% if user.is_staff %}
+												<td>
+													<button
+															type="button"
+															class="edit-lesson btn btn-xs btn-link"
+															onclick="editLessonForm({{lesson.id}})">
+														<span class="glyphicon glyphicon-pencil"></span>
+													</button>
+													<button
+															type="button"
+															class="delete-lesson btn btn-xs btn-link"
+															onclick="deleteLesson({{lesson.id}})">
+														<span class="glyphicon glyphicon-remove"></span>
+													</button>
+												</td>
+												<div
+														class="dialog"
+														title="Редактируем предмет"
+														data-lesson-id="{{lesson.id}}"
+														data-weekday="{{day}}"
+														data-group="{{group_form.group.value}}"
+														hidden>
+
+												</div>
+											{% endif %}
 										</tr>
 									{% endif %}
 								{% endfor %}
@@ -56,22 +84,7 @@
 
 						</table>
 					</div>
-					<div class="col-sm-1"></div>
-					<div class="col-sm-4">
-						{% if user.is_staff and edit_form %}
-							<form class="form" method="post" action="edit-lesson">
-								{% csrf_token %}
-								<div class="form-group">{% bootstrap_form_errors edit_form %}</div>
-								<input type="number" name="weekday" value="{{day}}" hidden>
-								<input type="text" name="group" value="{{group_form.group.value}}" hidden>
-								{% bootstrap_field edit_form.time_interval %}
-								{% bootstrap_field edit_form.room set_required=False %}
-								{% bootstrap_field edit_form.subject set_required=False %}
-								{% bootstrap_field edit_form.teacher set_required=False %}
-								<button type="submit" class="btn btn-primary">Сохранить</button>
-							</form>
-						{% endif %}
-					</div>
+					<div class="col-sm-4"></div>
 
 				</div>
 			</div>

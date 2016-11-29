@@ -1,11 +1,9 @@
 from feed.models import Post as myPost
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.views.generic import RedirectView, View
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
+from django.views.generic import RedirectView, View, DetailView, ListView
 from .forms import *
 from django.shortcuts import redirect, get_object_or_404, render, reverse
-from django.http import HttpResponse, JsonResponse
-import json
+from django.http import HttpResponse, JsonResponse, Http404
 
 
 class Feed(ListView):
@@ -27,30 +25,17 @@ class Feed(ListView):
 		return queryset
 
 
-class PostDetail(CreateView):
+class PostDetail(DetailView):
 	template_name = 'feed/post.html'
-	model = Comment
-	form_class = AddCommentForm
-
-	def dispatch(self, request, pk=None, *args, **kwargs):
-		self.related_post = get_object_or_404(myPost, pk=pk)
-		return super(PostDetail, self).dispatch(request, *args, **kwargs)
+	model = Post
 
 	def get_context_data(self, **kwargs):
 		parent = super(PostDetail, self)
 		context = parent.get_context_data(**kwargs)
-		context['post'] = self.related_post
-		context['comments'] = self.related_post.comment_set.all()
-		context['editing'] = 0
+		context['post'] = self.get_object()
+		context['comments'] = self.get_object().comment_set.all()
+		context['add_form'] = AddCommentForm()
 		return context
-	
-	def form_valid(self, form):
-		comment = form.save(commit=False)
-		if self.request.user.is_authenticated:
-			comment.author = self.request.user
-			comment.post = self.related_post
-			comment.save()
-		return redirect(reverse("feed:detail", kwargs={"pk": self.related_post.pk}))
 
 
 class AddPost(CreateView):
@@ -71,24 +56,23 @@ class AddPost(CreateView):
 		return redirect(reverse('feed:detail', kwargs={"pk": post.pk}))
 
 
-class Delete(DeleteView):
-	template_name = 'feed/post.html'
-	model = Comment
+class DeletePost(DeleteView):
+	template_name = 'feed/feed.html'
+	model = Post
 
-	def get_object(self):
-		obj = None
-		if 'comment' in self.request.POST:
-			pk = self.request.POST['comment']
-			obj = Comment.objects.get(pk=pk, author=self.request.user)
-		elif 'mypost' in self.request.POST:
-			pk = self.request.POST['mypost']
-			obj = myPost.objects.get(pk=pk, author=self.request.user)
+	def get_object(self, queryset=None):
+		if 'id' in self.request.POST:
+			feedpost = get_object_or_404(Post, pk=self.request.POST['id'], author=self.request.user)
+			return feedpost
 		else:
-			pass
-		return obj
+			raise Http404
+
+	def delete(self, request, *args, **kwargs):
+		super(DeletePost, self).delete(request, *args, **kwargs)
+		return HttpResponse("OK")
 
 	def get_success_url(self):
-		return self.request.META['HTTP_REFERER']
+		return reverse('feed:feed')
 
 
 class EditPost(UpdateView):
@@ -96,8 +80,8 @@ class EditPost(UpdateView):
 	model = myPost
 	form_class = AddPostForm
 
-	def dispatch(self, request, *args, **kwargs):
-		self.object = get_object_or_404(myPost, author=request.user, pk=request.POST['mypost'])
+	def dispatch(self, request, pk=None, *args, **kwargs):
+		self.object = get_object_or_404(myPost, author=request.user, pk=pk)
 		return super(EditPost, self).dispatch(request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
@@ -118,87 +102,74 @@ class EditPost(UpdateView):
 			return render(self.request, self.template_name, {'form': form})
 
 
-class EditComment(PostDetail):
+class DetailCommentView(DetailView):
+	model = Comment
+	template_name = 'feed/comment.html'
 
-	def dispatch(self, request, *args, **kwargs):
-		self.related_comment = get_object_or_404(Comment, pk=request.POST['comment'], author=request.user)
-		pk = self.related_comment.post.id
-		return super(EditComment, self).dispatch(request, pk=pk, *args, **kwargs)
 
-	def get_context_data(self, **kwargs):
-		context = super(EditComment, self).get_context_data(pk=self.related_comment.post.id, **kwargs)
-		pk = self.related_comment.id
-		context['editing'] = int(pk)
-		context['form'] = AddCommentForm({'entry': self.related_comment.entry})
-		return context
+class EditComment(UpdateView):
+	template_name = "feed/comment_form.html"
+	model = Comment
+	form_class = AddCommentForm
 
-	def form_valid(self, form):
-		setattr(self.related_comment, 'entry', form.cleaned_data['entry'])
-		self.related_comment.save()
-		return redirect(reverse('feed:post', kwargs={"pk": self.related_comment.post.id}))
+	def get_object(self, queryset=None):
+		comment = super(EditComment, self).get_object()
+		if comment.author == self.request.user:
+			return comment
+		else:
+			raise Http404
+
+	def get(self, request, *args, **kwargs):
+		self.form = AddCommentForm({'entry': self.get_object().entry})
+		return super(EditComment, self).get(request, *args, **kwargs)
+
+	def post(self, request, *args, **kwargs):
+		comment = self.get_object()
+		if 'entry' in request.POST:
+			entry = request.POST['entry']
+			setattr(comment, 'entry', entry)
+			comment.save()
+			return HttpResponse(entry)
+		else:
+			raise Http404
+
+
+class AddComment(CreateView):
+	template_name = "feed/add_comment_form.html"
+	model = Comment
+	form_class = AddCommentForm
+
+	def post(self, request, *args, **kwargs):
+		if request.user.is_authenticated and 'entry' in request.POST and 'post_id' in request.POST:
+			comment = Comment(
+				author=request.user,
+				entry=request.POST['entry'],
+				post=get_object_or_404(Post, pk=request.POST['post_id'])
+			)
+			comment.save()
+			return HttpResponse(comment.pk)
+		else:
+			raise Http404
 
 
 class DeleteComment(DeleteView):
-	template_name = 'feed/post.html'
 	model = Comment
+	template_name = "feed/post.html"
+
+	def get_object(self, queryset=None):
+		if 'id' in self.request.POST:
+			comment = get_object_or_404(Comment, pk=self.request.POST['id'], author=self.request.user)
+			self.post_id = comment.post.id
+			return comment
+		else:
+			raise Http404
 
 	def delete(self, request, *args, **kwargs):
-		obj = self.get_object(queryset=None)
-		if obj.author == self.request.user:
-			super(DeleteComment, self).delete(request, *args, **kwargs)
-			self.success_url = reverse('feed:detail', kwargs={"pk": object.post.pk})
-		else:
-			self.success_url = reverse('core:error', kwargs={'errors': 'Это не ваш комментарий!\t'})
+		super(DeleteComment, self).delete(request, *args, **kwargs)
+		return HttpResponse("OK")
 
-
-class Rate(RedirectView, UpdateView):
-
-	form_class = RateForm
-	template_name = 'feed/rate_form.html'
-
-	def form_valid(self, form):
-		post = Post.objects.get(pk=form.cleaned_data["pk"])
-		user = self.request.user
-
-		RatedPost.objects.update_or_create(
-			user=user,
-			post=post,
-			defaults={'mark': form.cleaned_data['mark']}
-		)
-
-		post.update_rating()
-
-		if 'HTTP_REFERER' in self.request.META:
-			return redirect(self.request.META['HTTP_REFERER'])
-		else:
-			return redirect(reverse('feed:detail', kwargs={'pk': post.id}))
-
-
-def rate(request):
-	if 'pk' in request.POST:
-		post = get_object_or_404(myPost, pk=request.POST['pk'])
-	else:
-		return redirect(reverse('feed:feed'))
-
-	if 'mark' in request.POST and abs(int(request.POST['mark'])) == 1:
-		mark = int(request.POST['mark'])
-	else:
-		return redirect(reverse('core:error', kwargs={'errors': 'Не надо пытаться химичить с оценками!\t'}))
-
-	user = request.user
-
-	RatedPost.objects.update_or_create(
-		user=user,
-		post=post,
-		defaults={'mark': mark}
-	)
-
-	post.update_rating()
-
-	if 'HTTP_REFERER' in request.META:
-		return redirect(request.META['HTTP_REFERER'])
-	else:
-		return redirect(reverse('feed:detail', kwargs={'pk': post.id}))
+	def get_success_url(self):
+		return reverse('feed:detail', kwargs={'pk': self.post_id})
 
 
 class ListRateView(View):

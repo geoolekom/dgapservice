@@ -2,27 +2,23 @@
 	<div class="col-sm-1" align="center">
 		{% if user.is_staff and post.author == user %}
 		<p> </p>
-			<form method="post" class="form-inline">
-				{% csrf_token %}
-				<input type="text" name="mypost" value="{{post.id}}" hidden>
-				<div class="dropdown">
-					<button class="btn btn-link btn-lg dropdown-toggle" type="button" data-toggle="dropdown">
-						<span class="glyphicon glyphicon-chevron-down"></span>
+		<div class="dropdown">
+			<button class="btn btn-link btn-lg dropdown-toggle" type="button" data-toggle="dropdown">
+				<span class="glyphicon glyphicon-chevron-down"></span>
+			</button>
+			<ul class="dropdown-menu">
+				<li>
+					<button type="button" class="delete-post btn btn-link" onclick="deletePost({{post.id}})">
+						<span class="glyphicon glyphicon-remove">  Удалить</span>
 					</button>
-					<ul class="dropdown-menu">
-						<li>
-							<button formaction="delete" class="btn btn-link">
-								<span class="glyphicon glyphicon-remove">  Удалить</span>
-							</button>
-						</li>
-						<li>
-							<button formaction="edit-post" class="btn btn-link">
-								<span class="glyphicon glyphicon-pencil">  Редактировать</span>
-							</button>
-						</li>
-					</ul>
-				</div>
-			</form>
+				</li>
+				<li>
+					<button class="edit-post btn btn-link" onclick="location.href='posts/edit/{{post.id}}'">
+						<span class="glyphicon glyphicon-pencil">  Редактировать</span>
+					</button>
+				</li>
+			</ul>
+		</div>
 		{% endif %}
 	</div>
 	<div class="col-sm-9">
