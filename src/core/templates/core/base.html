@@ -5,14 +5,16 @@
     <meta charset="utf-8">
     <meta name="author" content="geoolekom">
 
-    <script src="{% static 'core/js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'core/js/jquery-ui.js' %}"></script>
-    <script src="{% static 'core/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'core/js/main.js' %}"></script>
-
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/jquery-ui.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'redactor/css/redactor.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/main.css' %}">
+
+    <script type="text/javascript" src="{% static 'core/js/jquery-3.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'redactor/redactor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'core/js/main.js' %}"></script>
 
     <title> {% block title %} {% endblock %} </title>
     <style>
@@ -27,6 +29,8 @@
   </head>
 
   <body>
+
+    <div class="delete-confirm" title="Удалить?"></div>
 
     <nav class="navbar navbar-inverse" data-spy="affix" data-offset-top="0">
       <div class="container-fluid">

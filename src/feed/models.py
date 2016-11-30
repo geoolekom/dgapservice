@@ -3,11 +3,18 @@
 from django.db import models
 from core.models import User
 from django.conf import settings
+from redactor.fields import RedactorField
 
 
 class Post(models.Model):
 	title = models.CharField(verbose_name='Заголовок', max_length=200)
-	entry = models.TextField(verbose_name="Текст поста")
+	entry = RedactorField(
+		verbose_name=u'Текст поста',
+		redactor_options={'lang': 'кг', 'focus': True},
+		upload_to='media/posts/',
+		allow_file_upload=True,
+		allow_image_upload=True,
+	)
 	author = models.ForeignKey(settings.AUTH_USER_MODEL, parent_link=True)
 	rating = models.IntegerField('Рейтинг', default=0)
 
@@ -52,7 +59,13 @@ class RatedPost(models.Model):
 
 class Comment(models.Model):
 	author = models.ForeignKey(settings.AUTH_USER_MODEL, parent_link=True)
-	entry = models.TextField(verbose_name='Комментарий')
+	entry = RedactorField(
+		verbose_name=u'Комментарий',
+		redactor_options={'lang': 'ru', 'focus': True},
+		upload_to='media/comments/',
+		allow_file_upload=True,
+		allow_image_upload=True,
+	)
 	post = models.ForeignKey(Post, parent_link=True)
 
 	pub_time = models.DateTimeField('Время публикации', auto_now_add=True)

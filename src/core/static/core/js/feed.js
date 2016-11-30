@@ -9,7 +9,6 @@ $(document).ready(function() {
 		})
 
 		$.getJSON('/feed/ratings', {ids: postIds.join(',')} , function(data) {
-			console.log(data);
 			for (var i in data) {
 				$('.post-rating[data-post-id='+i+']').html('<b>' + data[i] + '</b>');
 			}
@@ -30,7 +29,6 @@ $(document).ready(function() {
 		$(minusButton).removeClass('btn-danger');
 
 		var csrf = $("input[name='csrfmiddlewaretoken']").val();
-		console.log(csrf);
 		$.post(
 			url, 
 			{mark: 1, csrfmiddlewaretoken: csrf}, 
@@ -50,7 +48,6 @@ $(document).ready(function() {
 		$(this).addClass('btn-danger');
 
 		var csrf = $("input[name='csrfmiddlewaretoken']").val();
-		console.log(csrf);
 		$.post(
 			url, 
 			{mark: -1, csrfmiddlewaretoken: csrf}, 

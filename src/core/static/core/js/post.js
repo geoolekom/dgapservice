@@ -18,22 +18,40 @@ function addComment (post_id) {
 		function (data) {
 			$.get('comments/' + data, function (response) {
 				$('.comments').append(response);
-				$("textarea[id='id_entry']").val("");
+				$(".redactor-editor").addClass("redactor-placeholder")
+				$(".redactor-editor").html("<p>​</p>");
 			});
-			
 	});
 }
 
 function deleteComment (id) {
 	var csrf = $("input[name='csrfmiddlewaretoken']").val();
-	$.post(
-		'comments/delete', 
-		{id: id, csrfmiddlewaretoken: csrf}, 
-		function (data) {
-			$('.comment[data-comment-id=' + id + ']').remove();
-	});
+	var comment = $('.comment[data-comment-id=' + id + ']');
+	var dialog = $('.delete-confirm').dialog({
+		modal: true,
+		position: { my: "center", at: "center", of: comment },
+		buttons: {
+			"Удалить": function () {
+				$.post(
+					'comments/delete', 
+					{id: id, csrfmiddlewaretoken: csrf}, 
+					function (data) {
+						comment.remove();
+				});
+				dialog.dialog("close");
+			},
+			"Отмена": function () {
+				dialog.dialog("close");
+			}
+		}
+	})
 }
 
 function loadForm (id) {
-	$('.comment-entry[data-comment-id=' + id + ']').load('comments/edit/' + id);
+	$.get('comments/edit/' + id, function (data) {
+		var comment = $('.comment-entry[data-comment-id=' + id + ']')
+		comment.html(data);
+		comment.children('.form-group').children('textarea').redactor();
+	})
+	//$('.comment-entry[data-comment-id=' + id + ']').load('comments/edit/' + id);
 }

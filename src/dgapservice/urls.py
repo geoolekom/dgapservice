@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('feed:feed'))),
@@ -26,4 +27,5 @@ urlpatterns = [
     url(r'^services/', include('services.urls', namespace='services')),
     url(r'^library/', include('library.urls', namespace='library')),
     url(r'^core/', include('core.urls', namespace='core')),
+    url(r'^redactor/', include('redactor.urls')),
 ]

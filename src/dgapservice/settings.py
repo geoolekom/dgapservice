@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap3',
+    'redactor',
     'core',
     'feed',
     'groups',
@@ -140,4 +141,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = '/home/geoolekom/track/web/dgapservice/media/'
 AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = '/feed/'
+
+REDACTOR_OPTIONS = {'lang': 'ru'}
+REDACTOR_UPLOAD = MEDIA_ROOT
 
