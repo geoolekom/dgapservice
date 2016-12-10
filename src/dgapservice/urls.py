@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 from django.views.decorators.csrf import csrf_exempt
+from feed.views import JsonPosts
+from django.conf import settings
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('feed:feed'))),
@@ -28,4 +30,11 @@ urlpatterns = [
     url(r'^library/', include('library.urls', namespace='library')),
     url(r'^core/', include('core.urls', namespace='core')),
     url(r'^redactor/', include('redactor.urls')),
+    url(r'^api/posts/', JsonPosts.as_view()),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]

@@ -1,7 +1,8 @@
 {% if user.is_authenticated %}
+    {% with post_disliked_by=disliked_by|get_value_from_dict:post.id post_liked_by=liked_by|get_value_from_dict:post.id %}
     <button
             type="button"
-            class="plus-button btn btn-block {% if user in post.liked_by %}btn-success{% else %}btn-default{% endif %}"
+            class="plus-button btn btn-block {% if user.id in post_liked_by %}btn-success{% else %}btn-default{% endif %}"
             name="mark"
             data-rate-url="{% url 'feed:rate' pk=post.id %}"
             data-post-id="{{ post.id }}">
@@ -9,10 +10,11 @@
     </button>
     <button
             type="button"
-            class="minus-button btn btn-block {% if user in post.disliked_by %}btn-danger{% else %}btn-default{% endif %}"
+            class="minus-button btn btn-block {% if user.id in post_disliked_by %}btn-danger{% else %}btn-default{% endif %}"
             name="mark"
             data-rate-url="{% url 'feed:rate' pk=post.id %}"
             data-post-id="{{ post.id }}">
         <b> - </b>
     </button>
+    {% endwith %}
 {% endif %}

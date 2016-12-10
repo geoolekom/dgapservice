@@ -48,7 +48,7 @@
 								{% for lesson in object_list %}
 									{% if lesson.weekday == day %}
 										<tr class="lesson success" data-lesson-id="{{lesson.id}}">
-											<td align="center" onclick=""> {{ rings | get_value_from_dict:lesson.time_interval }}</td>
+											<td align="center"> {{ rings | get_value_from_dict:lesson.time_interval }}</td>
 											<td align="center"> {{ lesson.room | default_if_none:'' }} </td>
 											<td> <a href="{{ lesson.subject.get_link }}"> {{ lesson.subject | default_if_none:'' }} </td>
 											<td> <a href="{{ lesson.teacher.get_link }}"> {{ lesson.teacher | default_if_none:'' }}</a> </td>

@@ -44,12 +44,6 @@ class Post(models.Model):
 			self.rating += rated.mark
 		self.save()
 
-	def liked_by(self):
-		return [a.user for a in RatedPost.objects.filter(post=self, mark=1)]
-
-	def disliked_by(self):
-		return [a.user for a in RatedPost.objects.filter(post=self, mark=-1)]
-
 
 class RatedPost(models.Model):
 	user = models.ForeignKey(User)

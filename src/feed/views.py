@@ -4,12 +4,19 @@ from django.views.generic import RedirectView, View, DetailView, ListView
 from .forms import *
 from django.shortcuts import redirect, get_object_or_404, render, reverse
 from django.http import HttpResponse, JsonResponse, Http404
+from django.template.defaulttags import register
+
+
+@register.filter
+def get_value_from_dict(dictionary, key):
+	return dictionary.get(key)
 
 
 class Feed(ListView):
 	template_name = 'feed/feed.html'
+	queryset = myPost.objects.all().order_by('-pub_time')
 
-	def get_queryset(self):
+	'''def get_queryset(self):
 		queryset = myPost.objects.all().order_by('-pub_time')
 
 		if 'searchstr' in self.request.GET:
@@ -22,7 +29,26 @@ class Feed(ListView):
 				queryset = queryset.order_by('-rating')
 			else:
 				pass
-		return queryset
+		self.queryset = queryset
+		return queryset'''
+
+	def get_context_data(self, **kwargs):
+		context = super(Feed, self).get_context_data(**kwargs)
+		ratings = list(RatedPost.objects.filter(post__in=self.queryset).all())
+		context['liked_by'] = dict()
+		context['disliked_by'] = dict()
+
+		for post in self.queryset:
+			context['liked_by'][post.id] = [
+				rating.user.id for rating in ratings
+				if rating.mark == 1 and rating.post == post
+				]
+			context['disliked_by'][post.id] = [
+				rating.user.id for rating in ratings
+				if rating.mark == -1 and rating.post == post
+				]
+
+		return context
 
 
 class PostDetail(DetailView):
@@ -35,6 +61,18 @@ class PostDetail(DetailView):
 		context['post'] = self.get_object()
 		context['comments'] = self.get_object().comment_set.all()
 		context['add_form'] = AddCommentForm()
+		context['liked_by'] = dict()
+		context['disliked_by'] = dict()
+
+		ratings = list(RatedPost.objects.filter(post=self.object).all())
+		context['liked_by'][self.object.id] = [
+				rating.user.id for rating in ratings
+				if rating.mark == 1 and rating.post == self.object
+				]
+		context['disliked_by'][self.object.id] = [
+				rating.user.id for rating in ratings
+				if rating.mark == -1 and rating.post == self.object
+				]
 		return context
 
 
@@ -201,5 +239,30 @@ class PostRateView(View):
 			)
 			self.feedpost.update_rating()
 		return HttpResponse(self.feedpost.rating)
+
+
+class JsonPosts(View):
+
+	def get(self, request):
+		if request.GET:
+			post = get_object_or_404(Post, pk=request.GET['id'])
+			post_dict = {'posts': [{
+				'id': post.id,
+				'title': post.title,
+				'entry': post.entry,
+				'author': post.author.username,
+				'comments': [{
+					             'author': comment.author.username,
+					             'entry': comment.entry,
+				             } for comment in post.comment_set.all()],
+			}]}
+		else:
+			post_dict = {"posts": [{
+				'id': post.id,
+				'title': post.title,
+				'entry': post.entry,
+				'author': post.author.username,
+			} for post in Post.objects.all()]}
+		return JsonResponse(post_dict)
 
 
