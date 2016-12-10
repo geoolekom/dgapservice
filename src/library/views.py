@@ -15,16 +15,16 @@ class BookListView(ListView):
 	model = Subject
 
 	def dispatch(self, request, *args, acts=None, **kwargs):
-		group_number, self.group_form = get_group_form(request)
+		group_pk, self.group_form = get_group_form(request)
 		try:
-			self.active_subject = Subject.objects.get(pk=acts)
+			self.active_subject = Subject.objects.filter(pk=acts).get()
 		except Subject.DoesNotExist:
 			self.active_subject = None
 		return super(BookListView, self).dispatch(request, *args, **kwargs)
 
 	def get_queryset(self):
 		if self.group_form.is_valid():
-			group = Group.objects.get(group_number=self.group_form.cleaned_data['group'])
+			group = Group.objects.filter(pk=self.group_form.cleaned_data['group']).prefetch_related('subjects__books').get()
 			return group.subjects.all()
 		else:
 			return Subject.objects.none()
