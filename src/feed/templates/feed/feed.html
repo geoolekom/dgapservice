@@ -11,28 +11,41 @@
 	{% if object_list %}
 		{% csrf_token %}
 		<div class="row blocked header">
-			<div class="col-sm-8">
+			<div class="col-sm-7">
+				{% for page in paginator.page_range %}
+					{% if page_obj.number == page %}
+						<a href="?page={{ page }}" class="btn btn-sm active"><h6><b>Страница {{ page }} из {{ paginator.page_range | length }} </b></h6></a>
+					{% else %}
+						<a href="?page={{ page }}" class="btn btn-sm"><h6><b>{{ page }}</b></h6></a>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<div class="col-sm-3">
 				<form class="form-inline">
 					<div class="form-group">
-						<select class="form-control" id="sort" name="sort">
-							<option value="1">По дате добавления</option>
-							<option value="2">По рейтингу</option>
-						</select>
 						<button class="btn btn-link"><span class="glyphicon glyphicon-filter"></span></button>
+						<select class="form-control" id="sort" name="sort">
+							<option value="1">Новые сверху</option>
+							<option value="2">Лучшие сверху</option>
+						</select>
 					</div>
 				</form>
 			</div>
-			<div class="col-sm-1">
-				{% if user.is_staff %}
-					<a href="{% url 'feed:post-add' %}" class="btn btn-link"><span class="glyphicon glyphicon-plus"></a>
-				{% endif %}
-			</div>
-			<div class="col-sm-3">
+			<div class="col-sm-2">
 				<form class="form-horizontal">
 					<div class="form-group">
 						<input type="text" class="form-control" name="searchstr" placeholder="Поиск" value="" id="srch">
 					</div>
 				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+				{% if user.is_staff %}
+					<a href="{% url 'feed:post-add' %}" class="btn btn-link">
+						<h5><span class="glyphicon glyphicon-plus"></span>   Новый пост</h5>
+					</a>
+				{% endif %}
 			</div>
 		</div>
 
@@ -49,6 +62,14 @@
 							<p> {{ post.summary | safe }} </p>
 						</div>
 					</div>
+					{% endfor %}
+
+					{% for page in paginator.page_range %}
+						{% if page_obj.number == page %}
+							<a href="?page={{ page }}" class="btn btn-sm active"><h6><b>Страница {{ page }} из {{ paginator.page_range | length }} </b></h6></a>
+						{% else %}
+							<a href="?page={{ page }}" class="btn btn-sm"><h6><b>{{ page }}</b></h6></a>
+						{% endif %}
 					{% endfor %}
 				</div>
 			</div>

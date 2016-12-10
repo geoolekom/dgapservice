@@ -15,26 +15,32 @@ def get_value_from_dict(dictionary, key):
 
 class Feed(ListView):
 	template_name = 'feed/feed.html'
-	queryset = list(myPost.objects.all().order_by('-pub_time'))
+	#   queryset = list(myPost.objects.all().order_by('-pub_time'))
+	paginate_by = 4
 
 	#   TODO: use javascript for search and filter
-	'''
 	def get_queryset(self):
-		queryset = myPost.objects.all().order_by('-pub_time')
+		self.queryset = myPost.objects.all().order_by('-pub_time')
 
 		if 'searchstr' in self.request.GET:
 			searchstr = self.request.GET['searchstr']
-			queryset = queryset.filter(entry__icontains=searchstr)
+			#   queryset = queryset.filter(entry__icontains=searchstr)
+		else:
+			searchstr = ''
+
 		if 'sort' in self.request.GET:
-			if self.request.GET['sort'] == '1':
-				queryset = queryset.order_by('-pub_time')
-			elif self.request.GET['sort'] == '2':
-				queryset = queryset.order_by('-rating')
+			sort_type = self.request.GET['sort']
+			if sort_type == '1':
+				order_by = '-pub_time'
+			elif sort_type == '2':
+				order_by = '-rating'
 			else:
-				pass
-		self.queryset = queryset
-		return queryset
-		'''
+				order_by = '-pub_time'
+		else:
+			order_by = '-pub_time'
+
+		self.queryset = self.queryset.filter(entry__icontains=searchstr).order_by(order_by)
+		return self.queryset
 
 	def get_context_data(self, **kwargs):
 		context = super(Feed, self).get_context_data(**kwargs)
