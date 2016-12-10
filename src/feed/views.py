@@ -1,10 +1,11 @@
 from feed.models import Post as myPost
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic import RedirectView, View, DetailView, ListView
-from .forms import *
+from feed.forms import *
 from django.shortcuts import redirect, get_object_or_404, render, reverse
 from django.http import HttpResponse, JsonResponse, Http404
 from django.template.defaulttags import register
+from django.db.models import Prefetch
 
 
 @register.filter
@@ -14,9 +15,11 @@ def get_value_from_dict(dictionary, key):
 
 class Feed(ListView):
 	template_name = 'feed/feed.html'
-	queryset = myPost.objects.all().order_by('-pub_time')
+	queryset = list(myPost.objects.all().order_by('-pub_time'))
 
-	'''def get_queryset(self):
+	#   TODO: use javascript for search and filter
+	'''
+	def get_queryset(self):
 		queryset = myPost.objects.all().order_by('-pub_time')
 
 		if 'searchstr' in self.request.GET:
@@ -30,7 +33,8 @@ class Feed(ListView):
 			else:
 				pass
 		self.queryset = queryset
-		return queryset'''
+		return queryset
+		'''
 
 	def get_context_data(self, **kwargs):
 		context = super(Feed, self).get_context_data(**kwargs)
@@ -40,12 +44,12 @@ class Feed(ListView):
 
 		for post in self.queryset:
 			context['liked_by'][post.id] = [
-				rating.user.id for rating in ratings
-				if rating.mark == 1 and rating.post == post
+				rating.user_id for rating in ratings
+				if rating.mark == 1 and rating.post_id == post.id
 				]
 			context['disliked_by'][post.id] = [
-				rating.user.id for rating in ratings
-				if rating.mark == -1 and rating.post == post
+				rating.user_id for rating in ratings
+				if rating.mark == -1 and rating.post_id == post.id
 				]
 
 		return context
@@ -53,25 +57,37 @@ class Feed(ListView):
 
 class PostDetail(DetailView):
 	template_name = 'feed/post.html'
+	post_id = None
+	object = None
 	model = Post
+
+	def dispatch(self, request, pk=None, *args, **kwargs):
+		self.post_id = int(pk)
+		return super(PostDetail, self).dispatch(request, pk, *args, **kwargs)
+
+	def get_object(self, queryset=None):
+		self.object = Post.objects.filter(pk=self.post_id)\
+			.prefetch_related('comment_set__author')\
+			.prefetch_related('ratedpost_set').get()
+		return self.object
 
 	def get_context_data(self, **kwargs):
 		parent = super(PostDetail, self)
 		context = parent.get_context_data(**kwargs)
-		context['post'] = self.get_object()
-		context['comments'] = self.get_object().comment_set.all()
+		context['post'] = self.object
+		context['comments'] = self.object.comment_set.all()
 		context['add_form'] = AddCommentForm()
 		context['liked_by'] = dict()
 		context['disliked_by'] = dict()
 
-		ratings = list(RatedPost.objects.filter(post=self.object).all())
+		ratings = self.object.ratedpost_set.all()
 		context['liked_by'][self.object.id] = [
-				rating.user.id for rating in ratings
-				if rating.mark == 1 and rating.post == self.object
+				rating.user_id for rating in ratings
+				if rating.mark == 1 and rating.post_id == self.object.id
 				]
 		context['disliked_by'][self.object.id] = [
-				rating.user.id for rating in ratings
-				if rating.mark == -1 and rating.post == self.object
+				rating.user_id for rating in ratings
+				if rating.mark == -1 and rating.post_id == self.object.id
 				]
 		return context
 
@@ -251,10 +267,11 @@ class JsonPosts(View):
 				'title': post.title,
 				'entry': post.entry,
 				'author': post.author.username,
-				'comments': [{
-					             'author': comment.author.username,
-					             'entry': comment.entry,
-				             } for comment in post.comment_set.all()],
+				'comments': [
+					{
+						'author': comment.author.username,
+						'entry': comment.entry,
+					} for comment in post.comment_set.all()],
 			}]}
 		else:
 			post_dict = {"posts": [{

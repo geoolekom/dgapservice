@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-sm-1" align="center">
-		{% if user.is_staff and post.author == user %}
+		{% if user.is_staff and post.author_id == user.id %}
 		<p> </p>
 		<div class="dropdown">
 			<button class="btn btn-link btn-lg dropdown-toggle" type="button" data-toggle="dropdown">

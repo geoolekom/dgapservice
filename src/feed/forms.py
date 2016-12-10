@@ -14,10 +14,3 @@ class AddPostForm(forms.ModelForm):
 		model = Post
 		fields = ('title', 'entry', )
 
-
-class RateForm(forms.Form):
-
-	choices = [post.pk for post in Post.objects.all()]
-
-	pk = forms.ChoiceField(choices=choices)
-	mark = forms.IntegerField()

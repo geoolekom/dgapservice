@@ -28,8 +28,13 @@ class LessonListView(ListView):
 
 	def get_queryset(self):
 		if self.group_form.is_valid():
-			group = Group.objects.get(group_number=self.group_form.cleaned_data['group'])
-			return Lesson.objects.filter(group=group).order_by('time_interval')
+			group = Group.objects.get(pk=self.group_form.cleaned_data['group'])
+			return Lesson.objects\
+				.filter(group=group)\
+				.prefetch_related('room')\
+				.prefetch_related('subject')\
+				.prefetch_related('teacher')\
+				.order_by('time_interval')
 		else:
 			return Lesson.objects.none()
 
