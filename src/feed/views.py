@@ -5,7 +5,7 @@ from feed.forms import *
 from django.shortcuts import redirect, get_object_or_404, render, reverse
 from django.http import HttpResponse, JsonResponse, Http404
 from django.template.defaulttags import register
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 
 @register.filter
@@ -13,33 +13,21 @@ def get_value_from_dict(dictionary, key):
 	return dictionary.get(key)
 
 
-class Feed(ListView):
+class Feed(ListView, FormView):
 	template_name = 'feed/feed.html'
-	#   queryset = list(myPost.objects.all().order_by('-pub_time'))
+	queryset = list(myPost.objects.all().order_by('-pub_time'))
 	paginate_by = 4
-
+	form_class = CustomizeFeedForm
+	form = CustomizeFeedForm()
+	
 	#   TODO: use javascript for search and filter
 	def get_queryset(self):
-		self.queryset = myPost.objects.all().order_by('-pub_time')
 
-		if 'searchstr' in self.request.GET:
+		if self.request.GET:
 			searchstr = self.request.GET['searchstr']
-			#   queryset = queryset.filter(entry__icontains=searchstr)
-		else:
-			searchstr = ''
+			sort_by = self.request.GET['sort_by']
+			self.queryset = myPost.objects.filter(Q(entry__icontains=searchstr) | Q(title__icontains=searchstr)).order_by(sort_by)
 
-		if 'sort' in self.request.GET:
-			sort_type = self.request.GET['sort']
-			if sort_type == '1':
-				order_by = '-pub_time'
-			elif sort_type == '2':
-				order_by = '-rating'
-			else:
-				order_by = '-pub_time'
-		else:
-			order_by = '-pub_time'
-
-		self.queryset = self.queryset.filter(entry__icontains=searchstr).order_by(order_by)
 		return self.queryset
 
 	def get_context_data(self, **kwargs):
@@ -47,6 +35,9 @@ class Feed(ListView):
 		ratings = list(RatedPost.objects.filter(post__in=self.queryset).all())
 		context['liked_by'] = dict()
 		context['disliked_by'] = dict()
+
+		if self.request.GET:
+			context['form'] = CustomizeFeedForm(self.request.GET)
 
 		for post in self.queryset:
 			context['liked_by'][post.id] = [
@@ -157,7 +148,7 @@ class EditPost(UpdateView):
 		if form.is_valid:
 			post = form.save(commit=False)
 			post.save()
-			return redirect('/feed/' + str(self.object.id))
+			return redirect(reverse('feed:post', kwargs={'pk': self.object.id}))
 		else:
 			return render(self.request, self.template_name, {'form': form})
 
