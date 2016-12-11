@@ -8,6 +8,7 @@ from groups.forms import get_group_form
 from django.views.generic import ListView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404, redirect, reverse
 from django.http import JsonResponse
+from django.db.models import F, Q
 
 
 class LessonListView(ListView):
@@ -29,14 +30,18 @@ class LessonListView(ListView):
 	def get_queryset(self):
 		if self.group_form.is_valid():
 			group = Group.objects.get(pk=self.group_form.cleaned_data['group'])
-			return Lesson.objects\
+			self.queryset = Lesson.objects\
 				.filter(group=group)\
 				.prefetch_related('room')\
 				.prefetch_related('subject')\
 				.prefetch_related('teacher')\
 				.order_by('time_interval')
+			if 'recently_changed' in self.request.GET and self.request.GET['recently_changed'] == 'true':
+				self.queryset = self.queryset.filter(Q(upd_time__gt=F('pub_time')) & Q(upd_time__gt=datetime.datetime.now() - datetime.timedelta(days=1)))
 		else:
-			return Lesson.objects.none()
+			self.queryset = Lesson.objects.none()
+
+		return self.queryset
 
 	def get_context_data(self, **kwargs):
 		context = super(LessonListView, self).get_context_data(**kwargs)

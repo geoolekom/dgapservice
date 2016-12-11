@@ -13,17 +13,20 @@ def get_value_from_dict(dictionary, key):
 	return dictionary.get(key)
 
 
-class Feed(ListView, FormView):
+class Feed(ListView):
 	template_name = 'feed/feed.html'
 	queryset = list(myPost.objects.all().order_by('-pub_time'))
 	paginate_by = 4
-	form_class = CustomizeFeedForm
 	form = CustomizeFeedForm()
+	
+	def dispatch(self, request, *args, **kwargs):
+		self.form = CustomizeFeedForm(request.GET or None)
+		return super(Feed, self).dispatch(request, *args, **kwargs)
 	
 	#   TODO: use javascript for search and filter
 	def get_queryset(self):
 
-		if self.request.GET:
+		if self.form.is_valid():
 			searchstr = self.request.GET['searchstr']
 			sort_by = self.request.GET['sort_by']
 			self.queryset = myPost.objects.filter(Q(entry__icontains=searchstr) | Q(title__icontains=searchstr)).order_by(sort_by)
@@ -35,9 +38,7 @@ class Feed(ListView, FormView):
 		ratings = list(RatedPost.objects.filter(post__in=self.queryset).all())
 		context['liked_by'] = dict()
 		context['disliked_by'] = dict()
-
-		if self.request.GET:
-			context['form'] = CustomizeFeedForm(self.request.GET)
+		context['form'] = self.form
 
 		for post in self.queryset:
 			context['liked_by'][post.id] = [

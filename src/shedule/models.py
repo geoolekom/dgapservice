@@ -53,6 +53,9 @@ class Lesson(models.Model):
 	teacher = models.ForeignKey(Teacher, verbose_name='Преподаватель', blank=True, null=True)
 	subject = models.ForeignKey(Subject, verbose_name='Предмет', blank=True, null=True)
 
+	pub_time = models.DateTimeField('Время публикации', auto_now_add=True)
+	upd_time = models.DateTimeField('Последнее изменение', auto_now=True)
+
 	def __str__(self):
 		return str(self.group) + ": " + str(self.subject) + " в " + str(self.weekday)
 
