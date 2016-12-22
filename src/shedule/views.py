@@ -32,9 +32,9 @@ class LessonListView(ListView):
 			group = Group.objects.get(pk=self.group_form.cleaned_data['group'])
 			self.queryset = Lesson.objects\
 				.filter(group=group)\
-				.prefetch_related('room')\
-				.prefetch_related('subject')\
-				.prefetch_related('teacher')\
+				.select_related('room')\
+				.select_related('subject')\
+				.select_related('teacher')\
 				.order_by('time_interval')
 			if 'recently_changed' in self.request.GET and self.request.GET['recently_changed'] == 'true':
 				self.queryset = self.queryset.filter(Q(upd_time__gt=F('pub_time')) & Q(upd_time__gt=datetime.datetime.now() - datetime.timedelta(days=1)))

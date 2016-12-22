@@ -4,6 +4,12 @@ from django.db import models
 from core.models import User
 from django.conf import settings
 from redactor.fields import RedactorField
+from django.utils.cache import caches
+import logging
+
+cache = caches['default']
+
+logger = logging.getLogger(__name__)
 
 
 class Post(models.Model):
@@ -39,10 +45,27 @@ class Post(models.Model):
 		self.save()
 
 	def update_rating(self):
-		self.rating = 0
-		for rated in RatedPost.objects.filter(post=self):
-			self.rating += rated.mark
+		key = 'post_rating_' + str(self.id)
+		self.rating = RatedPost.objects.filter(post=self).aggregate(rating_sum=models.Sum('mark'))['rating_sum']
+		#for rated in RatedPost.objects.filter(post=self):
+		#	self.rating += rated.mark
+		cache.set(key, None)
 		self.save()
+
+	def get_rating(self):
+		key = 'post_rating_' + str(self.id)
+		cached_rating = cache.get(key)
+		if cached_rating is None:
+			cached_rating = self.rating
+			cache.set(key, cached_rating, 5)
+		else:
+			print("FROM CACHE")
+		return cached_rating
+
+	def save(self, *args, **kwargs):
+		super(Post, self).save(*args, **kwargs)
+		cache.set('post_rating_' + str(self.id), None)
+		logger.debug(str(self.author) + " saved post " + str(self.id))
 
 
 class RatedPost(models.Model):
@@ -67,3 +90,7 @@ class Comment(models.Model):
 
 	def __str__(self):
 		return str(self.post) + ":\t" + str(self.entry)
+	
+	def save(self, *args, **kwargs):
+		super(Comment, self).save(*args, **kwargs)
+		logger.debug(str(self.author) + " saved comment " + str(self.id))

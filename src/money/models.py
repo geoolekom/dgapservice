@@ -16,6 +16,6 @@ class Operation(models.Model):
 	comment = models.CharField(max_length=100)
 
 	def provide(self):
-		self.account.balance += sum
+		self.account.balance += self.sum
 		pass
 

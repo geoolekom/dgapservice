@@ -149,7 +149,7 @@ class EditPost(UpdateView):
 		if form.is_valid:
 			post = form.save(commit=False)
 			post.save()
-			return redirect(reverse('feed:post', kwargs={'pk': self.object.id}))
+			return redirect(reverse('feed:detail', kwargs={'pk': self.object.id}))
 		else:
 			return render(self.request, self.template_name, {'form': form})
 
@@ -229,7 +229,8 @@ class ListRateView(View):
 	def get(self, request):
 		ids = request.GET.get('ids', '')
 		ids = ids.split(',')
-		posts = dict(Post.objects.filter(id__in=ids).values_list('id', 'rating'))
+		posts = {post.id: post.get_rating() for post in Post.objects.filter(id__in=ids)}
+		#   posts = dict(values_list('id', 'rating'))
 		return JsonResponse(posts)
 
 
@@ -240,7 +241,7 @@ class PostRateView(View):
 		return super(PostRateView, self).dispatch(request, *args, **kwargs)
 
 	def get(self, request):
-		return HttpResponse(self.feedpost.rating)
+		return HttpResponse(self.feedpost.get_rating())
 
 	def post(self, request):
 		user = request.user
@@ -252,7 +253,7 @@ class PostRateView(View):
 				defaults={'mark': mark}
 			)
 			self.feedpost.update_rating()
-		return HttpResponse(self.feedpost.rating)
+		return HttpResponse(self.feedpost.get_rating())
 
 
 class JsonPosts(View):

@@ -27,7 +27,7 @@
 		<h6 class="text-muted" style="margin:0; margin-left:10"> {{post.pub_time}} </h6>
 	</div>
 	<div class="col-xs-1 post-rating" align="right" data-post-id="{{ post.id }}">
-		<b> {{ post.rating }} </b>
+		<b> {{ post.get_rating }} </b>
 	</div>
-	<div class="col-xs-1 rate-form" align="right" data-post-id="{{ post.id }}">  {% include 'feed/rate_form.html' %}  </div>
+	<div class="col-xs-1 rate-form" align="right" data-post-id="{{ post.id }}"> {% include 'feed/rate_form.html' %}  </div>
 </div>
