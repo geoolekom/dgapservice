@@ -1,10 +1,16 @@
 {% load bootstrap3 %}
+{% load i18n %}
 
 {% if user.is_authenticated %}
 
   <li class="dropdown">
       <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-          <strong> {% if user.get_full_name %} {{user.get_full_name}} {%else%} {{user}} {% endif %} </strong>
+          <strong>
+              {% if user.get_full_name %}
+                {% blocktrans %}Привет, {{user.get_full_name}}{% endblocktrans %}
+              {%else%}
+                {% blocktrans with username=user.username %}Как тебя зовут, {{ username }}?{% endblocktrans %}
+              {% endif %} </strong>
           <span class="caret"></span>
       </a>
         <ul class="dropdown-menu list-group" role="menu">

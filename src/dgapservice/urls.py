@@ -20,9 +20,15 @@ from django.views.generic import RedirectView
 from django.views.decorators.csrf import csrf_exempt
 from feed.views import JsonPosts
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url=reverse_lazy('feed:feed'))),
+]
+
+urlpatterns += i18n_patterns(
+    url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     url(r'^admin/', admin.site.urls),
     url(r'^feed/', include('feed.urls', namespace="feed")),
     url(r'^shedule/', include('shedule.urls', namespace='shedule')),
@@ -31,7 +37,7 @@ urlpatterns = [
     url(r'^core/', include('core.urls', namespace='core')),
     url(r'^redactor/', include('redactor.urls')),
     url(r'^api/posts/', JsonPosts.as_view()),
-]
+)
 
 if settings.DEBUG:
     import debug_toolbar

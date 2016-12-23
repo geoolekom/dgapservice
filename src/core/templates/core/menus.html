@@ -5,13 +5,15 @@
 {% url 'services:print' as print %}
 {% url 'library:library' as library %}
 
-<li class='{% if request.path == feed %}active{%endif%}'><a href='{{ feed }}'>Лента</a></li>
-<li class='{% if request.path == shedule %}active{%endif%}'><a href='{{ shedule }}'>Расписание</a></li>
-<li class='{% if request.path == library %}active{%endif%}'><a href='{{ library }}'>Бибилиотека</a></li>
-<li class='{% if request.path == print %}active{%endif%}'><a href='{{ print }}'>Печать</a></li>
-<li class='{% if request.path == laundry %}active{%endif%}'><a href='{{ laundry }}'>Прачечная</a></li>
-<li class='{% if request.path == food %}active{%endif%}'><a href='{{ food }}'>Еда</a></li>
+{% load i18n %}
+
+<li class='{% if request.path == feed %}active{%endif%}'><a href='{{ feed }}'>{% trans "Лента" %}</a></li>
+<li class='{% if request.path == shedule %}active{%endif%}'><a href='{{ shedule }}'>{% trans "Расписание" %}</a></li>
+<li class='{% if request.path == library %}active{%endif%}'><a href='{{ library }}'>{% trans "Бибилиотека" %}</a></li>
+<li class='{% if request.path == print %}active{%endif%}'><a href='{{ print }}'>{% trans "Печать" %}</a></li>
+<li class='{% if request.path == laundry %}active{%endif%}'><a href='{{ laundry }}'>{% trans "Прачечная" %}</a></li>
+<li class='{% if request.path == food %}active{%endif%}'><a href='{{ food }}'>{% trans "Еда" %}</a></li>
 {% if user.is_staff %}
-    <li><a href='/admin'>Админка</a></li>
-    <li><a href='https://github.com/geoolekom/dgapservice'>Исходники</a></li>
+    <li><a href='/admin'>{% trans "Админка" %}</a></li>
+    <li><a href='https://github.com/geoolekom/dgapservice'>{% trans "Исходники" %}</a></li>
 {% endif %}

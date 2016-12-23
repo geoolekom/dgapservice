@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 
 <html lang="en">
   <head>
@@ -14,6 +15,7 @@
     <script type="text/javascript" src="{% static 'core/js/bootstrap.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/jquery-ui.js' %}"></script>
     <script type="text/javascript" src="{% static 'redactor/redactor.js' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script type="text/javascript" src="{% static 'core/js/main.js' %}"></script>
 
     <title> {% block title %} {% endblock %} </title>
@@ -37,7 +39,7 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="{% url 'feed:feed' %}">
             <span class="glyphicon glyphicon-fire"></span>
-            <strong> ФОПФ </strong>
+            <strong>{% trans "ФОПФ" %}</strong>
           </a>
         </div>
 

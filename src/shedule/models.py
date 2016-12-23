@@ -4,6 +4,7 @@ from django.db import models
 from groups.models import FacultyGroup as Group
 from library.models import Subject
 import datetime
+from django.utils.translation import ugettext_lazy as _
 
 rings = {
 	0: 'Неизвестно',
@@ -16,7 +17,14 @@ rings = {
 	7: '18:30 - 19:50',
 }
 
-weekdays = {1: 'Понедельник', 2: 'Вторник', 3: 'Среда', 4: 'Четверг', 5: 'Пятница', 6: 'Суббота'}
+weekdays = {
+	1: _('Понедельник'),
+	2: _('Вторник'),
+	3: _('Среда'),
+	4: _('Четверг'),
+	5: _('Пятница'),
+	6: _('Суббота'),
+}
 
 
 class Teacher(models.Model):
