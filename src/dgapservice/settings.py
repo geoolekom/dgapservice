@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from configparser import ConfigParser
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,14 +20,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'u#unhmud8(dr5t1)29_ew!aq3-_rq!3%$-w7w_)^v$2hlfya$u'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+config = ConfigParser()
+config.read(os.path.join(BASE_DIR, '../local.conf'))
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config.get('main', 'SECRET_KEY')
 
 # Application definition
 
@@ -40,15 +43,25 @@ CACHES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'dgapservice.log'),
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
     },
     'loggers': {
@@ -65,7 +78,7 @@ LOGGING = {
     },
 }
 
-INTERNAL_IPS = "127.0.0.1",
+INTERNAL_IPS = config.get("main", "SERVER_IP"),
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -131,8 +144,8 @@ WSGI_APPLICATION = 'dgapservice.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.' + config.get('database', 'backend'),
+        'NAME': os.path.join(BASE_DIR, config.get('database', 'filename')),
     }
 }
 
