@@ -5,4 +5,5 @@ create.sh
 run.sh
 .idea
 local.conf
+src/dgapservice.log
 
