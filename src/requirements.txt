@@ -57,7 +57,7 @@ Twisted==16.0.0
 ubuntu-tweak==0.8.8
 ubuntuone-client-data==14.4
 unity-lens-photos==1.0
-urllib3==1.13.1
+urllib3==1.26.5
 wxPython==3.0.2.0
 wxPython-common==3.0.2.0
 zope.interface==4.1.3
